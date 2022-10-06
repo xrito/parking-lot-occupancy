@@ -1,0 +1,44 @@
+name: parking
+services:
+  frontend:
+    build:
+      context: .
+      target: app_caddy
+    depends_on:
+      - php
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost, caddy:80}
+    restart: unless-stopped
+  deepstack:
+    image: 'deepquestai/deepstack:gpu'
+    environment:
+      - VISION-DETECTION=True
+    ports:
+      - '80:5000'
+    container_name:    deepstack
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+  camera:
+    image: 'eroji/rtsp2mjpg:alpine'
+    container_name: camera
+    environment:
+      - RTSP_URL=${RTSP_URL}
+  backend:
+    hostname: 'backend'
+    build:
+      context: .
+      target: backend
+    container_name:  backend
+    volumes:
+      - ./config:/var/www/html/config
+      - ./vendor:/var/www/html/vendor
+      - ./src:/var/www/html/src
+      - ./public:/var/www/html/public
+    restart: always
+    environment:
+      - ENABLE_XDEBUG=${ENABLE_XDEBUG}
