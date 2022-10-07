@@ -1,0 +1,7 @@
+https://powernic.tech:9345 {
+    tls your.email@address.com
+    root * /var/www/html/public
+    php_fastcgi backend:9000 {
+        try_files /index.php =404
+    }
+}

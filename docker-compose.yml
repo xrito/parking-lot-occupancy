@@ -1,21 +1,24 @@
 name: parking
 services:
   frontend:
-    build:
-      context: .
-      target: app_caddy
+    image: caddy:2-alpine
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./public:/var/www/html/public
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
-      - php
-    environment:
-      SERVER_NAME: ${SERVER_NAME:-localhost, caddy:80}
+      - backend
+    ports:
+      - 9345:9345
     restart: unless-stopped
+    container_name: frontend
   deepstack:
     image: 'deepquestai/deepstack:gpu'
     environment:
       - VISION-DETECTION=True
-    ports:
-      - '80:5000'
     container_name:    deepstack
+    restart: unless-stopped
     deploy:
       resources:
         reservations:
@@ -26,6 +29,7 @@ services:
   camera:
     image: 'eroji/rtsp2mjpg:alpine'
     container_name: camera
+    restart: unless-stopped
     environment:
       - RTSP_URL=${RTSP_URL}
   backend:
@@ -42,3 +46,7 @@ services:
     restart: always
     environment:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}
+
+volumes:
+  caddy_data:
+  caddy_config:
