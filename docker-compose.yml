@@ -43,6 +43,9 @@ services:
       - ./vendor:/var/www/html/vendor
       - ./src:/var/www/html/src
       - ./public:/var/www/html/public
+      - ./composer.json:/var/www/html/composer.json
+      - ./composer.lock:/var/www/html/composer.lock
+      - ./.env:/var/www/html/.env
     restart: always
     environment:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}

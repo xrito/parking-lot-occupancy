@@ -16,7 +16,7 @@ class FindCarsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln("Find cars");
-        $output->writeln( "Свободные места под номером: " .  implode(", ", $this->parkingService->getSpotAvailable()));
+        $output->writeln( "Свободные места под номером: " .  implode(", ", $this->parkingService->getFreeSpots()));
         $output->writeln("Done");
         return 0;
     }

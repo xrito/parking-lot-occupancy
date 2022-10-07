@@ -20,7 +20,7 @@ class ParkingController extends AbstractController
     {
         $alisaRequest = AlisaRequest::createFromRequest($request);
         return new AlisaResponse(
-            "Свободные место под номером: " .  implode(", ", $this->parkingService->getSpotAvailable())
+            "Свободные место под номером: " .  implode(", ", $this->parkingService->getFreeSpots())
         );
     }
 }
