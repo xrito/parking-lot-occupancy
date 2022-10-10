@@ -26,7 +26,8 @@ class ParkingService
     public function drawSpotPredictions(): void
     {
         $carPredictions = $this->visionService->detectCars($this->snapshotSrc);
-        $this->drawService->drawPredictions($this->snapshotSrc, $this->snapshotDest, $carPredictions);
+        //$this->drawService->drawPredictions($this->snapshotSrc, $this->snapshotDest, $carPredictions);
+        $this->drawService->drawSpots($this->snapshotSrc, $this->snapshotDest, $this->spotService->getSpots());
     }
 
 

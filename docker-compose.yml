@@ -17,7 +17,7 @@ services:
     image: 'deepquestai/deepstack:gpu'
     environment:
       - VISION-DETECTION=True
-    container_name:    deepstack
+    container_name: deepstack
     restart: unless-stopped
     deploy:
       resources:
@@ -37,7 +37,7 @@ services:
     build:
       context: .
       target: backend
-    container_name:  backend
+    container_name: backend
     volumes:
       - ./config:/var/www/html/config
       - ./vendor:/var/www/html/vendor
@@ -46,9 +46,13 @@ services:
       - ./composer.json:/var/www/html/composer.json
       - ./composer.lock:/var/www/html/composer.lock
       - ./.env:/var/www/html/.env
+      - ./tests:/var/www/html/tests
+      - ./node_modules:/var/www/html/node_modules
+      - ./phpunit.xml.dist:/var/www/html/phpunit.xml.dist
     restart: always
     environment:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}
+      - VISION_API=${VISION_API}
 
 volumes:
   caddy_data:

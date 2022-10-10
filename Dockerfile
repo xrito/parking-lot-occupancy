@@ -11,6 +11,8 @@ RUN apk add --no-cache \
         bash \
         less \
         php8-pecl-imagick \
+        nodejs \
+        npm \
 	;
 
 # install gnu-libiconv and set LD_PRELOAD env to make iconv work fully on Alpine image.

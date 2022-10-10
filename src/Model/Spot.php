@@ -2,7 +2,7 @@
 
 namespace Parking\Model;
 
-class Spot
+class Spot implements RectangleInterface
 {
 
     public function __construct(
@@ -13,17 +13,17 @@ class Spot
     {
     }
 
-    public function isFree(Prediction $prediction): bool
+    public function isFree(RectangleInterface $prediction): bool
     {
         return ($this->getXMax() < $prediction->getXMin() || $prediction->getXMax() < $this->getXMin(
             ) || $this->getYMax() < $prediction->getYMin() || $prediction->getYMax() < $this->getYMin());
     }
 
     /**
-     * @param Prediction $prediction
+     * @param RectangleInterface $prediction
      * @return float - from 0 to 1
      */
-    public function getUsedSpace(Prediction $prediction): float
+    public function getUsedSpace(RectangleInterface $prediction): float
     {
         $intersectArea = $this->calculateIntersectArea($prediction);
         return $intersectArea / $this->getArea();
@@ -34,34 +34,37 @@ class Spot
         return $this->width * $this->height;
     }
 
-    private function calculateIntersectArea(Prediction $prediction): int
+    private function calculateIntersectArea(RectangleInterface $prediction): int
     {
         $minX = max($this->getXMin(), $prediction->getXMin());
         $minY = max($this->getYMin(), $prediction->getYMin());
         $maxX = min($this->getXMax(), $prediction->getXMax());
         $maxY = min($this->getYMax(), $prediction->getYMax());
+        if ($minX > $maxX || $minY > $maxY) {
+            return 0;
+        }
         $horizontal = $maxX - $minX;
         $vertical = $maxY - $minY;
         return $horizontal * $vertical;
     }
 
-    private function getXMin(): int
+    public function getXMin(): int
     {
         return $this->x;
     }
 
-    private function getYMin(): int
+    public function getYMin(): int
     {
         return $this->y;
     }
 
-    private function getXMax(): int
+    public function getXMax(): int
     {
         return $this->x + $this->width;
     }
 
-    private function getYMax(): int
+    public function getYMax(): int
     {
-        return $this->x + $this->width;
+        return $this->y + $this->height;
     }
 }

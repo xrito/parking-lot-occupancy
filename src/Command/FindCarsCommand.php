@@ -17,6 +17,7 @@ class FindCarsCommand extends Command
     {
         $output->writeln("Find cars");
         $output->writeln( "Свободные места под номером: " .  implode(", ", $this->parkingService->getFreeSpots()));
+        $this->parkingService->drawSpotPredictions();
         $output->writeln("Done");
         return 0;
     }

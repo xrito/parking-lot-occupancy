@@ -2,15 +2,15 @@
 
 namespace Parking\Model;
 
-class Prediction
+class Prediction implements RectangleInterface
 {
     public function __construct(
         private string $label,
         private float $confidence,
-        private float $x_min,
-        private float $y_min,
-        private float $x_max,
-        private float $y_max
+        private int $x_min,
+        private int $y_min,
+        private int $x_max,
+        private int $y_max
     ) {
     }
 
@@ -33,7 +33,7 @@ class Prediction
     /**
      * @return float
      */
-    public function getXMin(): float
+    public function getXMin(): int
     {
         return $this->x_min;
     }
@@ -41,7 +41,7 @@ class Prediction
     /**
      * @return float
      */
-    public function getYMin(): float
+    public function getYMin(): int
     {
         return $this->y_min;
     }
@@ -49,7 +49,7 @@ class Prediction
     /**
      * @return float
      */
-    public function getXMax(): float
+    public function getXMax(): int
     {
         return $this->x_max;
     }
@@ -57,7 +57,7 @@ class Prediction
     /**
      * @return float
      */
-    public function getYMax(): float
+    public function getYMax(): int
     {
         return $this->y_max;
     }

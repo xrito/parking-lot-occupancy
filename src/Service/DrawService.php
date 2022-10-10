@@ -6,6 +6,8 @@ use Imagick;
 use ImagickDraw;
 use ImagickPixel;
 use Parking\Model\Prediction;
+use Parking\Model\RectangleInterface;
+use Parking\Model\Spot;
 
 class DrawService
 {
@@ -39,23 +41,23 @@ class DrawService
         $this->drawLabel($image, $prediction);
     }
 
-    private function drawBorder(Imagick $image, Prediction $prediction): void
+    private function drawBorder(Imagick $image, RectangleInterface $rectangle, string $color = null): void
     {
-        $draw = $this->createDraw();
+        $draw = $this->createDraw($color);
         $draw->rectangle(
-            $prediction->getXMin(),
-            $prediction->getYMin(),
-            $prediction->getXMax(),
-            $prediction->getYMax()
+            $rectangle->getXMin(),
+            $rectangle->getYMin(),
+            $rectangle->getXMax(),
+            $rectangle->getYMax()
         );
         $image->drawImage($draw);
     }
 
-    private function createDraw(): ImagickDraw
+    private function createDraw(string $color = null): ImagickDraw
     {
         $draw = new ImagickDraw();
         $draw->setFillOpacity(0);
-        $draw->setStrokeColor(new ImagickPixel($this->color));
+        $draw->setStrokeColor(new ImagickPixel($color ?? $this->color));
         $draw->setStrokeWidth($this->borderWidth);
         $draw->setFont($this->fontPath);
         $draw->setFontSize($this->fontSize);
@@ -74,5 +76,30 @@ class DrawService
             $label
         );
     }
+
+    /**
+     * @param string $snapshotDest
+     * @param string $snapshotDest1
+     * @param Spot[] $spots
+     * @return void
+     */
+    public function drawSpots(string $snapshotDest, string $snapshotDest1, array $spots): void
+    {
+        $image = new Imagick($snapshotDest) ;
+        foreach ($spots as $ind => $spot) {
+            $this->drawBorder($image, $spot, 'green');
+            $draw = $this->createDraw('green');
+             $image->annotateImage(
+                $draw,
+                $spot->getXMin(),
+                $spot->getYMin() - 10,
+                0,
+                'Место: ' . $ind + 1
+            );
+        }
+        $image->writeImage($snapshotDest1);
+
+    }
+
 
 }
