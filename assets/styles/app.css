@@ -1,0 +1,12 @@
+#camera{
+    width: auto;
+    position: relative;
+    margin: 0 auto;
+}
+#camera img{
+    max-width:100%;
+    display: block;
+    position: absolute;
+    left:0;
+    top:0;
+}

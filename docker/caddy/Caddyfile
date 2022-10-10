@@ -2,6 +2,13 @@ https://powernic.tech:9345 {
     tls your.email@address.com
     root * /var/www/html/public
     php_fastcgi backend:9000 {
-        try_files /index.php =404
+        try_files {path} /index.php =404
     }
+
+	file_server
+
+	handle_errors {
+		respond "{http.error.status_code} {http.error.status_text}"
+		file_server
+	}
 }

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div {{ stimulus_controller('hello') }}>
+        <div id="camera" style="width: 640px;height: 360px">
+            <img src='http://127.0.0.1:8090/live.mjpg' width="640" height="360">
+            <canvas id="spot-overlay" {{ stimulus_target('hello', 'camera') }} width="640" height="360"></canvas>
+        </div>
+        <input type="number" {{ stimulus_target('hello', 'number') }} >
+        <button {{ stimulus_action('hello', 'addSpot') }}>
+            Добавить мето
+        </button>
+        <button {{ stimulus_action('hello', 'saveSpots') }}>
+            Сохранить
+        </button>
+    </div>
+{% endblock %}
