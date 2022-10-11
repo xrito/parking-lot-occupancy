@@ -2,6 +2,8 @@
 
 namespace Parking\Service;
 
+use Parking\Model\Prediction;
+
 class ParkingService
 {
     public function __construct(
@@ -28,6 +30,14 @@ class ParkingService
         $carPredictions = $this->visionService->detectCars($this->snapshotSrc);
         //$this->drawService->drawPredictions($this->snapshotSrc, $this->snapshotDest, $carPredictions);
         $this->drawService->drawSpots($this->snapshotSrc, $this->snapshotDest, $this->spotService->getSpots());
+    }
+
+    /**
+     * @return Prediction[]
+     */
+    public function getCarPredictions(): array
+    {
+        return array_values($this->visionService->detectCars($this->snapshotSrc));
     }
 
 

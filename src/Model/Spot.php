@@ -67,4 +67,14 @@ class Spot implements RectangleInterface
     {
         return $this->y + $this->height;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'x' => $this->x,
+            'y' => $this->y,
+            'width' => $this->width,
+            'height' => $this->height
+        ];
+    }
 }

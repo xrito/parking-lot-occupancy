@@ -2,7 +2,7 @@
 
 namespace Parking\Model;
 
-class Prediction implements RectangleInterface
+class Prediction implements RectangleInterface, \JsonSerializable
 {
     public function __construct(
         private string $label,
@@ -65,5 +65,17 @@ class Prediction implements RectangleInterface
     public function isCar(): bool
     {
         return $this->label === 'car';
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'label' => $this->label,
+            'confidence' => $this->confidence,
+            'x' => $this->x_min,
+            'y' => $this->y_min,
+            'width' => $this->x_max - $this->x_min,
+            'height' => $this->y_max - $this->y_min,
+        ];
     }
 }

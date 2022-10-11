@@ -35,10 +35,4 @@ class ParkingController extends AbstractController
     {
         return new Response($this->twig->render('admin.html.twig'));
     }
-
-    #[Route('/spots', name: 'spots', options: ['expose' => true], methods: ['POST'])]
-    public function saveSpots(Request $request): Response
-    {
-        return new Response('s');
-    }
 }

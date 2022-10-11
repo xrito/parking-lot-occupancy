@@ -1,3 +1,4 @@
+ARG CADDY_VERSION=2
 FROM php:8.0.24-fpm-alpine3.15 AS backend
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -114,3 +115,21 @@ RUN set -eux; \
     fi
 
 ENTRYPOINT ["docker-entrypoint"]
+
+FROM backend as backend_dev
+RUN rm -f .env.local.php
+
+FROM caddy:${CADDY_VERSION}-builder-alpine AS app_caddy_builder
+
+RUN xcaddy build \
+	--with github.com/dunglas/mercure \
+	--with github.com/dunglas/mercure/caddy \
+	--with github.com/dunglas/vulcain \
+	--with github.com/dunglas/vulcain/caddy
+
+FROM caddy:${CADDY_VERSION} AS frontend
+
+COPY --from=app_caddy_builder /usr/bin/caddy /usr/bin/caddy
+WORKDIR /var/www/html
+
+COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile

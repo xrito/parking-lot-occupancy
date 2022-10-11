@@ -1,7 +1,12 @@
 name: parking
 services:
   frontend:
-    image: caddy:2-alpine
+    build:
+      context: .
+      target: frontend
+    environment:
+      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
     volumes:
       - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./public:/var/www/html/public
@@ -38,7 +43,7 @@ services:
     hostname: 'backend'
     build:
       context: .
-      target: backend
+      target: backend_dev
     container_name: backend
     volumes:
       - ./config:/var/www/html/config
@@ -55,13 +60,13 @@ services:
       - ./templates:/var/www/html/templates
       - ./node_modules:/var/www/html/node_modules
       - ./phpunit.xml.dist:/var/www/html/phpunit.xml.dist
-      - ./.env.local.php:/var/www/html/.env.local.php
       - ./webpack.config.js:/var/www/html/webpack.config.js
       - ./var:/var/www/html/var
     restart: always
     environment:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}
       - VISION_API=${VISION_API}
+      - MERCURE_JWT_SECRET=${MERCURE_JWT_SECRET}
 
 volumes:
   caddy_data:

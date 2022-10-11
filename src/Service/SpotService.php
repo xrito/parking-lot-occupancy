@@ -19,7 +19,26 @@ class SpotService
     public function getSpots(): array
     {
         $inlineSpots = file_get_contents($this->spotFilePath);
-        return $this->serializer->deserialize($inlineSpots, Spot::class . '[]', 'json');
+        return $this->deserializeSpotsFromJson($inlineSpots);
+    }
+
+    /**
+     * @param Spot[] $spots
+     * @return void
+     */
+    public function saveSpots(array $spots): void
+    {
+        $inlineSpots = json_encode(array_map(fn(Spot $spot) => $spot->toArray(), $spots));
+        file_put_contents($this->spotFilePath, $inlineSpots);
+    }
+
+    /**
+     * @param string $json
+     * @return Spot[]
+     */
+    public function deserializeSpotsFromJson(string $json): array
+    {
+        return $this->serializer->deserialize($json, Spot::class . '[]', 'json');
     }
 
 }

@@ -2,6 +2,7 @@
     width: auto;
     position: relative;
     margin: 0 auto;
+    outline: 1px solid #000;
 }
 #camera img{
     max-width:100%;
