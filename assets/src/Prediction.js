@@ -1,12 +1,25 @@
-export default class Prediction{
+import RectangleFactory from "./Factory/RectangleFactory";
+
+export default class Prediction extends fabric.Group{
     text;
     rectangle;
     /**
-     * @param {fabric.Text} text
-     * @param {fabric.Rect} rectangle
+     * @param {string} text
+     * @param {int} width
+     * @param {int} height
+     * @param {int} left
+     * @param {int} top
      */
-    constructor(text, rectangle){
+    constructor(text,  width, height, left, top){
+        const elements = RectangleFactory.create(text, width, height, 'green');
+        super(elements, {
+            left: left,
+            top: top,
+            width: width,
+            height: height,
+        });
         this.text = text;
-        this.rectangle = rectangle;
+        this.hoverCursor = 'auto';
+        this.selectable = false;
     }
 }

@@ -11,6 +11,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class VisionService
 {
+    private float $minConfidence = 0.5;
+
     public function __construct(
         private string $visionApi,
         private SerializerInterface $serializer)
@@ -35,7 +37,7 @@ class VisionService
     {
         $client = new CurlHttpClient();
         $formFields = [
-            'min_confidence' => '0',
+            'min_confidence' => $this->minConfidence . '',
             'image' => DataPart::fromPath($imageFilePath),
         ];
         $formData = new FormDataPart($formFields);

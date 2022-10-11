@@ -16,10 +16,10 @@ class TestMercureCommand extends Command
         parent::__construct("mercure:test");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $update = new Update("/books/1", json_encode($this->parkingService->getCarPredictions()));
-        $this->hub->publish($update);
+        $this->hub->publish(new Update("/predictions", json_encode($this->parkingService->getCarPredictionAndSpot())));
+        $this->hub->publish(new Update("/freeSpots", json_encode($this->parkingService->getFreeSpots())));
         $output->writeln("Published");
         return 0;
     }

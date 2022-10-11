@@ -22,6 +22,11 @@ class SpotService
         return $this->deserializeSpotsFromJson($inlineSpots);
     }
 
+    public function getSpotDimension(): int
+    {
+        return 640;
+    }
+
     /**
      * @param Spot[] $spots
      * @return void

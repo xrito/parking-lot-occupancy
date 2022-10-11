@@ -78,4 +78,12 @@ class Prediction implements RectangleInterface, \JsonSerializable
             'height' => $this->y_max - $this->y_min,
         ];
     }
+
+    public function normalize(float $predictionDimension): void
+    {
+        $this->x_min = (int)($this->x_min * $predictionDimension);
+        $this->y_min = (int)($this->y_min * $predictionDimension);
+        $this->x_max = (int)($this->x_max * $predictionDimension);
+        $this->y_max = (int)($this->y_max * $predictionDimension);
+    }
 }
