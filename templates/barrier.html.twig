@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div {{ stimulus_controller('barrier') }}>
+        <video width="640" height="480" controls {{ stimulus_target('barrier', 'video') }} class="video-js">
+            <source src="https://video1.intelpark.ru/921-50ac2ed41477bfc0805bb464619fd8e1/index-1665639235-3600.m3u8"
+                    type="application/x-mpegURL">
+        </video>
+    </div>
+{% endblock %}

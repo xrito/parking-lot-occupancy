@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class VisionService
 {
-    private float $minConfidence = 0.5;
+    private float $minConfidence = 0.05;
 
     public function __construct(
         private string $visionApi,
