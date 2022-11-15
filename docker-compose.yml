@@ -44,13 +44,19 @@ services:
               count: 1
               capabilities: [ gpu ]
   camera:
-    image: 'eroji/rtsp2mjpg:alpine'
+    build:
+      context: .
+      target: camera
     container_name: camera
     restart: unless-stopped
     volumes:
-      - ./docker/camera/ffserver.conf:/etc/ffserver.conf
+      - ./docker/camera/app:/app
+      - ./docker/camera/supervisord.conf:/etc/supervisord.conf
+      #- ./docker/camera/ffserver.conf:/etc/ffserver.conf
+      #- ./docker/camera/stream.sh:/usr/bin/stream.sh
     ports:
       - 8090:8090
+      - 8080:80
     environment:
       - RTSP_URL=${RTSP_URL}
   backend:

@@ -97,12 +97,6 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY composer.* symfony.* ./
 
-RUN set -eux; \
-    if [ -f composer.json ]; then \
-		composer install --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress; \
-		composer clear-cache; \
-    fi
-
 # copy sources
 COPY . .
 RUN rm -Rf docker/
@@ -112,7 +106,7 @@ RUN set -eux; \
     if [ -f composer.json ]; then \
 		composer dump-autoload --classmap-authoritative --no-dev; \
 		composer dump-env prod; \
-		composer run-script --no-dev post-install-cmd; \
+#		composer run-script --no-dev post-install-cmd; \
 		chmod +x bin/console; sync; \
     fi
 
@@ -135,3 +129,23 @@ COPY --from=app_caddy_builder /usr/bin/caddy /usr/bin/caddy
 WORKDIR /var/www/html
 
 COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
+
+FROM php:8.0.24-cli-alpine AS camera
+
+RUN rm /usr/local/bin/php-cgi  \
+    && rm /usr/local/bin/phpdbg \
+    && rm /usr/src -Rf
+
+RUN apk add --update supervisor && rm  -rf /tmp/* /var/cache/apk/*
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+ENV PATH="${PATH}:/root/.composer/vendor/bin"
+
+ADD docker/camera/supervisord.conf /etc/
+
+COPY --from=jrottenberg/ffmpeg:3-scratch / /
+COPY docker/camera/app /app
+WORKDIR /app
+ENTRYPOINT ["supervisord", "-n", "-c", "/etc/supervisord.conf"]

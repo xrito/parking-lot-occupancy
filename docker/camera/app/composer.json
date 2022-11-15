@@ -1,0 +1,15 @@
+{
+    "name": "powernic/camera",
+    "autoload": {
+        "psr-4": {
+            "Camera\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Powernic",
+            "email": "powernic1@gmail.com"
+        }
+    ],
+    "require": {}
+}
