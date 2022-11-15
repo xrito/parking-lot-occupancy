@@ -1,5 +1,16 @@
 name: parking
 services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    container_name: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo:/data/db/
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
   frontend:
     build:
       context: .
@@ -15,6 +26,7 @@ services:
     depends_on:
       - backend
     ports:
+      - 80:80
       - 9345:9345
     restart: unless-stopped
     container_name: frontend
@@ -31,21 +43,12 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
-
-  deepstackui:
-    image: robmarkcole/deepstack-ui:latest
-    container_name: deepstackui
-    ports:
-      - "8501:8501"
-    environment:
-      - DEEPSTACK_IP=deepstack
-      - DEEPSTACK_PORT=5000
-      - DEEPSTACK_CUSTOM_MODEL=license-plate
-    restart: always
   camera:
     image: 'eroji/rtsp2mjpg:alpine'
     container_name: camera
     restart: unless-stopped
+    volumes:
+      - ./docker/camera/ffserver.conf:/etc/ffserver.conf
     ports:
       - 8090:8090
     environment:
@@ -64,7 +67,7 @@ services:
       - ./composer.json:/var/www/html/composer.json
       - ./composer.lock:/var/www/html/composer.lock
       - ./package.json:/var/www/html/package.json
-      - ./package.lock:/var/www/html/package.lock
+      - ./package-lock.json:/var/www/html/package-lock.json
       - ./.env:/var/www/html/.env
       - ./assets:/var/www/html/assets
       - ./tests:/var/www/html/tests
@@ -78,20 +81,7 @@ services:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}
       - VISION_API=${VISION_API}
       - MERCURE_JWT_SECRET=${MERCURE_JWT_SECRET}
-  trainer:
-    image: ultralytics/yolov5
-    container_name: trainer
-    volumes:
-      - ./public/dataset:/usr/src/dataset
-    entrypoint: sleep 10000
-    ipc: host
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
 volumes:
   caddy_data:
   caddy_config:
+  mongo:

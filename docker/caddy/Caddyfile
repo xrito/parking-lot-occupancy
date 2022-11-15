@@ -1,5 +1,4 @@
-https://powernic.tech:9345 {
-    tls your.email@address.com
+:80 {
     route   {
         root * /var/www/html/public
 

@@ -63,7 +63,7 @@ Encore
 
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
-
+    .enableVueLoader( )
     // uncomment if you use React
     //.enableReactPreset()
 

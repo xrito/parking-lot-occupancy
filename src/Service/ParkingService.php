@@ -2,6 +2,8 @@
 
 namespace Parking\Service;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Parking\Document\Parking;
 use Parking\Model\Prediction;
 
 class ParkingService
@@ -11,9 +13,27 @@ class ParkingService
         private CameraService $cameraService,
         private DrawService $drawService,
         private SpotService $spotService,
+        private DocumentManager $documentManager,
         private string $snapshotSrc,
         private string $snapshotDest)
     {
+    }
+
+    public function getParkingPreviews(): array
+    {
+        $parkingList = $this->documentManager->getRepository(Parking::class)->findAll();
+        return array_map(fn(Parking $parking) => [
+            'id' => $parking->getId(),
+            'preview' => 'http://127.0.0.1:8090/still.jpg',
+        ], $parkingList);
+    }
+
+    public function addParking(string $stream): string
+    {
+        $parking = new Parking($stream);
+        $this->documentManager->persist($parking);
+        $this->documentManager->flush();
+        return $parking->getId();
     }
 
     public function getFreeSpots(): array
@@ -22,7 +42,7 @@ class ParkingService
         $carPredictions = $this->visionService->detectCars($this->snapshotSrc);
         $cameraDimension = $this->cameraService->getCameraDimension();
         $spotDimension = $this->spotService->getSpotDimension();
-        $predictionDimension = $spotDimension/$cameraDimension;
+        $predictionDimension = $spotDimension / $cameraDimension;
         array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $carPredictions);
         $spotAvailability = $this->getSpotAvailability($carPredictions);
         $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
@@ -44,14 +64,13 @@ class ParkingService
         $this->cameraService->makeSnapshot();
         $cameraDimension = $this->cameraService->getCameraDimension();
         $spotDimension = $this->spotService->getSpotDimension();
-        $predictionDimension = $spotDimension/$cameraDimension;
+        $predictionDimension = $spotDimension / $cameraDimension;
         $predictions = array_values($this->visionService->detectCars($this->snapshotSrc));
         array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $predictions);
         $spotAvailability = $this->getSpotAvailability($predictions);
         $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
         return $predictions;
     }
-
 
 
     /**

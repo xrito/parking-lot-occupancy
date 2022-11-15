@@ -83,6 +83,8 @@ RUN set -eux; \
 	\
 	apk del .build-deps
 
+COPY --from=jrottenberg/ffmpeg:3-scratch / /
+
 WORKDIR /var/www/html
 COPY docker/backend/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 

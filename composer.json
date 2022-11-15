@@ -10,6 +10,7 @@
         "ext-iconv": "*",
         "ext-imagick": "*",
         "doctrine/annotations": "^1.0",
+        "doctrine/mongodb-odm-bundle": "^4.5",
         "friendsofsymfony/jsrouting-bundle": "^3.2",
         "guzzlehttp/guzzle": "^7.5",
         "php-ffmpeg/php-ffmpeg": "^1.0",
@@ -29,7 +30,9 @@
         "symfony/runtime": "6.0.*",
         "symfony/serializer": "6.0.*",
         "symfony/twig-bundle": "6.0.*",
-        "symfony/webpack-encore-bundle": "^1.15",
+        "symfony/ux-vue": "^2.5",
+        "symfony/validator": "6.0.*",
+        "symfony/webpack-encore-bundle": "^1.16",
         "symfony/yaml": "6.0.*"
     },
     "config": {
@@ -80,7 +83,8 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.0.*"
+            "require": "6.0.*",
+            "docker": true
         }
     },
     "require-dev": {
