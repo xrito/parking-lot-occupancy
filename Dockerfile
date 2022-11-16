@@ -172,7 +172,11 @@ RUN apk add --update supervisor && rm  -rf /tmp/* /var/cache/apk/*
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-ENV PATH="${PATH}:/root/.composer/vendor/bin"
+RUN set -eux; \
+    if [ -f composer.json ]; then \
+		composer install --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress; \
+		composer clear-cache; \
+    fi
 
 COPY --from=jrottenberg/ffmpeg:3-scratch / /
 COPY docker/camera/app /app
