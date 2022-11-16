@@ -11,6 +11,10 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+  redis:
+    image: redis:latest
+    restart: always
+    container_name: redis
   frontend:
     build:
       context: .
@@ -51,14 +55,11 @@ services:
     restart: unless-stopped
     volumes:
       - ./docker/camera/app:/app
-      - ./docker/camera/supervisord.conf:/etc/supervisord.conf
-      #- ./docker/camera/ffserver.conf:/etc/ffserver.conf
-      #- ./docker/camera/stream.sh:/usr/bin/stream.sh
     ports:
       - 8090:8090
       - 8080:80
     environment:
-      - RTSP_URL=${RTSP_URL}
+      - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
   backend:
     hostname: 'backend'
     build:

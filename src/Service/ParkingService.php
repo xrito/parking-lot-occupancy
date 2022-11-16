@@ -24,7 +24,7 @@ class ParkingService
         $parkingList = $this->documentManager->getRepository(Parking::class)->findAll();
         return array_map(fn(Parking $parking) => [
             'id' => $parking->getId(),
-            'preview' => 'http://127.0.0.1:8090/still.jpg',
+            'preview' => 'http://127.0.0.1:8090/'.$parking->getId().'-still.jpg',
         ], $parkingList);
     }
 

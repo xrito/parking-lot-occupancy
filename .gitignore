@@ -16,3 +16,4 @@ __pycache__
 /vendor/
 /node_modules/
 ###< symfony/framework-bundle ###
+!/docker/camera/app/vendor/

@@ -2,6 +2,8 @@
 
 namespace Parking\Controller;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Parking\Document\Parking;
 use Parking\Model\AlisaRequest;
 use Parking\Model\AlisaResponse;
 use Parking\Service\ParkingService;
@@ -19,6 +21,7 @@ class ParkingController extends AbstractController
 {
     public function __construct(
         private ParkingService $parkingService,
+        private DocumentManager $documentManager,
         private ValidatorInterface $validator,
         private Environment $twig)
     {
@@ -42,6 +45,17 @@ class ParkingController extends AbstractController
     public function admin(Request $request): Response
     {
         return new Response($this->twig->render('admin.html.twig'));
+    }
+
+    #[Route('/api/streams', name: 'parking_streams', methods: ['GET'])]
+    public function getStreams(): JsonResponse
+    {
+        return new JsonResponse(
+            array_map(fn(Parking $parking) => [
+                'id' => $parking->getId(),
+                'url' => $parking->getStream(),
+            ], $this->documentManager->getRepository(Parking::class)->findAll())
+        );
     }
 
     #[Route('/api/parking', name: 'parking_all', methods: ['GET'])]
