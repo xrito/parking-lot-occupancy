@@ -16,6 +16,8 @@ use Symfony\Component\Process\Process;
 final class Worker
 {
 
+    private Logger $logger;
+
     /**
      * @param ConfigService $configService
      * @param Process[] $streamProcesses
@@ -28,13 +30,48 @@ final class Worker
         private ?Process $ffServerProcess = null,
         private string $ffserver = 'http://127.0.0.1:8090')
     {
+        $this->logger = new Logger();
+    }
+
+    public function sigHandler(int $signo): void
+    {
+        switch ($signo) {
+            case SIGTERM:
+                $this->logger->log("Stopping process.");
+                $this->stopFFStreams();
+                $this->stopFFServer();
+                $this->logger->log("Process stopped.");
+                exit;
+            case SIGHUP:
+                $this->restartFF();
+                break;
+        }
     }
 
     public function run(): void
     {
+        $this->bindSignals();
+        $this->initFF();
+        $this->runWorker();
+    }
+
+    private function bindSignals(): void
+    {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGTERM, [$this, 'sigHandler']);
+        pcntl_signal(SIGHUP, [$this, 'sigHandler']);
+    }
+
+    private function initFF(): void
+    {
+        $this->logger->log("Starting process.");
         $streams = $this->configService->getStreams();
         $this->startFFServer($streams);
         $this->runFFStreams($streams);
+    }
+
+    private function runWorker(): void
+    {
         $bus = $this->createMessageBus();
         $receivers = $this->createReceivers();
         $worker = new MessageWorker($receivers, $bus);
@@ -55,17 +92,22 @@ final class Worker
             new HandleMessageMiddleware(
                 new HandlersLocator([
                     UpdateStreamConfig::class => [
-                        function () {
-                            error_log('Starting update stream config');
-                            $streams = $this->configService->getStreams();
-                            $this->restartFFServer($streams);
-                            $this->restartFFStreams($streams);
-                            error_log('Finished update stream config');
+                        function() {
+                            $this->restartFF();
                         }
                     ]
                 ]),
             )
         ]);
+    }
+
+    public function restartFF(): void
+    {
+        $this->logger->log('Starting update stream config');
+        $streams = $this->configService->getStreams();
+        $this->restartFFServer($streams);
+        $this->restartFFStreams($streams);
+        $this->logger->log('Finished update stream config');
     }
 
     /**
@@ -99,7 +141,7 @@ final class Worker
                     $feedUrl
                 ]
             );
-            error_log('Starting stream: ' . $stream->getId());
+            $this->logger->log('Starting stream: ' . $stream->getId());
             $this->streamProcesses[] = $ffmpegProcess;
             $ffmpegProcess->start();
         }
@@ -116,18 +158,18 @@ final class Worker
 
     private function restartFFServer(array $streams): void
     {
-        $this->stopFFServer($streams);
+        $this->stopFFServer();
         $this->startFFServer($streams);
     }
 
     private function startFFServer(array $streams): void
     {
         $this->configService->createFFServerConfig($streams);
-        $this->ffServerProcess = new Process(["ffserver","-hide_banner","-loglevel","warning"]);
+        $this->ffServerProcess = new Process(["ffserver", "-hide_banner", "-loglevel", "warning"]);
         $this->ffServerProcess->start();
     }
 
-    private function stopFFServer(array $streams): void
+    private function stopFFServer(): void
     {
         $this->ffServerProcess->stop();
     }

@@ -140,15 +140,15 @@ COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
 
 FROM php:8.0.24-cli-alpine AS camera
 
-RUN rm /usr/local/bin/php-cgi  \
-    && rm /usr/local/bin/phpdbg \
-    && rm /usr/src -Rf
-
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		$PHPIZE_DEPS \
 	; \
 	\
+	docker-php-ext-configure pcntl --enable-pcntl; \
+	docker-php-ext-install -j$(nproc) \
+    	pcntl\
+    	; \
 	pecl install \
         redis \
 	; \
@@ -169,6 +169,11 @@ RUN set -eux; \
 	apk del .build-deps
 
 RUN apk add --update supervisor && rm  -rf /tmp/* /var/cache/apk/*
+
+RUN rm /usr/local/bin/php-cgi  \
+    && rm /usr/local/bin/phpdbg \
+    && rm /usr/src -Rf
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
