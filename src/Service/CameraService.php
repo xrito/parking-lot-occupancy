@@ -8,6 +8,11 @@ class CameraService
     {
     }
 
+    public function getPreviewUrl(string $streamId): string
+    {
+        return '/stream/' . $streamId . '-still.jpg';
+    }
+
     public function makeSnapshot(): void
     {
         $image = file_get_contents($this->snapshotApi);

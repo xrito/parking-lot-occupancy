@@ -55,9 +55,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./docker/camera/app:/app
-    ports:
-      - 8090:8090
-      - 8080:80
     environment:
       - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
   backend:

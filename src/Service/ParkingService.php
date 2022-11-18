@@ -4,7 +4,9 @@ namespace Parking\Service;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Parking\Document\Parking;
+use Parking\Message\UpdateStreamConfig;
 use Parking\Model\Prediction;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class ParkingService
 {
@@ -14,6 +16,7 @@ class ParkingService
         private DrawService $drawService,
         private SpotService $spotService,
         private DocumentManager $documentManager,
+        private MessageBusInterface $bus,
         private string $snapshotSrc,
         private string $snapshotDest)
     {
@@ -22,10 +25,22 @@ class ParkingService
     public function getParkingPreviews(): array
     {
         $parkingList = $this->documentManager->getRepository(Parking::class)->findAll();
-        return array_map(fn(Parking $parking) => [
-            'id' => $parking->getId(),
-            'preview' => 'http://127.0.0.1:8090/'.$parking->getId().'-still.jpg',
-        ], $parkingList);
+        return array_map(fn(Parking $parking) => $this->createParkingPreview($parking->getId()), $parkingList);
+    }
+
+    public function createParkingPreview(string $id): array
+    {
+        return ["id" => $id, "preview" => $this->cameraService->getPreviewUrl($id)];
+    }
+
+    public function removeParking(string $id): void
+    {
+        $parking = $this->documentManager->getRepository(Parking::class)->find($id);
+        if ($parking) {
+            $this->documentManager->remove($parking);
+            $this->documentManager->flush();
+            $this->bus->dispatch(new UpdateStreamConfig($id));
+        }
     }
 
     public function addParking(string $stream): string
@@ -33,6 +48,7 @@ class ParkingService
         $parking = new Parking($stream);
         $this->documentManager->persist($parking);
         $this->documentManager->flush();
+        $this->bus->dispatch(new UpdateStreamConfig($parking->getId()));
         return $parking->getId();
     }
 

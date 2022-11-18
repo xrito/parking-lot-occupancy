@@ -1,3 +1,11 @@
+<script setup lang="ts">
+defineProps({
+  modalId: {
+    type: String,
+    required: true
+  },
+})
+</script>
 <template>
   <div class="col">
     <div data-bs-toggle="modal" :data-bs-target="'#'+modalId" class="card-button btn btn-secondary shadow-sm  ">
@@ -6,20 +14,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "AddCameraButton",
-  mounted() {
-
-  },
-  props: {
-    modalId: {
-      type: String,
-      required: true
-    }
-  }
-}
-</script>
 
 <style scoped>
 

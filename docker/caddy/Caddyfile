@@ -12,10 +12,15 @@
 
         push
 
+
+        handle /stream/* {
+            uri strip_prefix /stream
+            reverse_proxy camera:8090
+        }
+
         php_fastcgi backend:9000 {
             try_files {path} /index.php =404
         }
-
         file_server
 	}
 

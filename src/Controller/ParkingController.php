@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Parking\Document\Parking;
 use Parking\Model\AlisaRequest;
 use Parking\Model\AlisaResponse;
+use Parking\Service\CameraService;
 use Parking\Service\ParkingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,6 +22,7 @@ class ParkingController extends AbstractController
 {
     public function __construct(
         private ParkingService $parkingService,
+        private CameraService $cameraService,
         private DocumentManager $documentManager,
         private ValidatorInterface $validator,
         private Environment $twig)
@@ -64,10 +66,28 @@ class ParkingController extends AbstractController
         return new JsonResponse($this->parkingService->getParkingPreviews());
     }
 
+    #[Route('/api/parking/{id}', name: 'parking_remove', methods: ['DELETE'])]
+    public function removeParking(Request $request): Response
+    {
+        $this->parkingService->removeParking($request->get('id'));
+        return new JsonResponse('ok');
+    }
+
     #[Route('/api/parking', name: 'parking_create', methods: ['POST'])]
     public function addParking(Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $contentType = $request->getContentType();
+
+        switch ($contentType) {
+            case 'json':
+                $data = json_decode($request->getContent(), true);
+                break;
+            case 'form':
+                $data = $request->request->all();
+                break;
+            default:
+                return new Response('Unsupported content type', 400);
+        }
         $errors = $this->validator->validate(
             $data['stream'],
             [
@@ -83,10 +103,6 @@ class ParkingController extends AbstractController
             return new Response($errorsString);
         }
         $id = $this->parkingService->addParking($data['stream']);
-        return new JsonResponse($this->createDefaultParkingPreview($id));
-    }
-
-    private function createDefaultParkingPreview(string $id): array{
-        return ["id" => $id, "preview" => 'http://127.0.0.1:8090/still.jpg'];
+        return new JsonResponse($this->parkingService->createParkingPreview($id));
     }
 }
