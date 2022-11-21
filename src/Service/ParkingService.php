@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Parking\Document\Parking;
 use Parking\Message\UpdateStreamConfig;
 use Parking\Model\Prediction;
+use Parking\Model\Spot;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ParkingService
@@ -28,9 +29,25 @@ class ParkingService
         return array_map(fn(Parking $parking) => $this->createParkingPreview($parking->getId()), $parkingList);
     }
 
+    public function getParking(string $id): ?array
+    {
+        $parking = $this->documentManager->getRepository(Parking::class)->find($id);
+        if ($parking === null) {
+            return null;
+        }
+        return array_merge(
+            $this->createParkingPreview($id),
+            ['spots' => $parking->getSpots()->toArray()]);
+    }
+
+
     public function createParkingPreview(string $id): array
     {
-        return ["id" => $id, "preview" => $this->cameraService->getPreviewUrl($id)];
+        return [
+            "id" => $id,
+            "preview" => $this->cameraService->getPreviewUrl($id),
+            'stream' => $this->cameraService->getStreamUrl($id),
+        ];
     }
 
     public function removeParking(string $id): void
@@ -43,6 +60,23 @@ class ParkingService
         }
     }
 
+    /**
+     * @param string $id
+     * @param Spot[] $spots
+     * @return void
+     */
+    public function updateSpots(string $id, array $spots): void
+    {
+        /** @var Parking $parking */
+        $parking = $this->documentManager->getRepository(Parking::class)->find($id);
+        if ($parking === null) {
+            return;
+        }
+        $parking->setSpots($spots);
+        $this->documentManager->persist($parking);
+        $this->documentManager->flush();
+    }
+
     public function addParking(string $stream): string
     {
         $parking = new Parking($stream);
@@ -52,9 +86,9 @@ class ParkingService
         return $parking->getId();
     }
 
-    public function getFreeSpots(): array
+    public function getFreeSpots(string $streamId): array
     {
-        $this->cameraService->makeSnapshot();
+        $this->cameraService->makeSnapshot($streamId);
         $carPredictions = $this->visionService->detectCars($this->snapshotSrc);
         $cameraDimension = $this->cameraService->getCameraDimension();
         $spotDimension = $this->spotService->getSpotDimension();
@@ -75,9 +109,9 @@ class ParkingService
     /**
      * @return Prediction[]
      */
-    public function getCarPredictionAndSpot(): array
+    public function getCarPredictionAndSpot(string $streamId): array
     {
-        $this->cameraService->makeSnapshot();
+        $this->cameraService->makeSnapshot($streamId);
         $cameraDimension = $this->cameraService->getCameraDimension();
         $spotDimension = $this->spotService->getSpotDimension();
         $predictionDimension = $spotDimension / $cameraDimension;
@@ -111,6 +145,5 @@ class ParkingService
         return array_map(fn($ind) => !(isset($usedSpaces[$ind]) && $usedSpaces[$ind] > 0.5),
             array_keys($spots));
     }
-
 
 }

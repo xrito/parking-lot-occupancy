@@ -1,12 +1,7 @@
-export default class RectangleFactory{
-    /**
-     * @param {string} title
-     * @param {int} width
-     * @param {int} height
-     * @param {string} color
-     * @return fabric.Object[]
-     */
-    static create(title, width, height,color = 'red'){
+import {fabric} from "fabric";
+
+export default class RectangleFactory {
+    static create(title: string, width: number, height: number, color: string = 'red') {
         const rect = new fabric.Rect({
             top: 0,
             left: 0,

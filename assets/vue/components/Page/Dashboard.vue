@@ -3,9 +3,9 @@ import AddCameraButton from "../Preview/AddCameraButton.vue";
 import CameraFormModal from "../Modal/CameraFormModal.vue";
 import ParkingPreview from "../Preview/ParkingPreview.vue";
 import ParkingRepository from "../../../src/Repository/ParkingRepository";
-import {onMounted, Ref, ref} from "vue";
-import ParkingForm from "../../../src/Model/ParkingForm";
-import Parking from "../../../src/Model/Parking";
+import {onMounted,  ref} from "vue";
+import type ParkingForm from "../../../src/Model/ParkingForm";
+import type Parking from "../../../src/Model/Parking";
 
 const parkingPreviews = ref([] as Parking[]);
 const cameraFormId = "camera-form"

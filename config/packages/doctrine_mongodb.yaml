@@ -16,6 +16,12 @@ doctrine_mongodb:
                     dir: '%kernel.project_dir%/src/Document'
                     prefix: 'Parking\Document'
                     alias: Parking
+                Model:
+                    is_bundle: false
+                    type: attribute
+                    dir: '%kernel.project_dir%/src/Model'
+                    prefix: 'Parking\Model'
+                    alias: Parking
 
 when@prod:
     doctrine_mongodb:

@@ -66,10 +66,16 @@ class ParkingController extends AbstractController
         return new JsonResponse($this->parkingService->getParkingPreviews());
     }
 
-    #[Route('/api/parking/{id}', name: 'parking_remove', methods: ['DELETE'])]
-    public function removeParking(Request $request): Response
+    #[Route('/api/parking/{id}', name: 'parking_one', methods: ['GET'])]
+    public function getParking(string $id): JsonResponse
     {
-        $this->parkingService->removeParking($request->get('id'));
+        return new JsonResponse($this->parkingService->getParking($id));
+    }
+
+    #[Route('/api/parking/{id}', name: 'parking_remove', methods: ['DELETE'])]
+    public function removeParking(string $id): Response
+    {
+        $this->parkingService->removeParking($id);
         return new JsonResponse('ok');
     }
 

@@ -7,17 +7,20 @@
 
 <script setup lang="ts">
 import {defineProps, onMounted, ref} from "vue";
+
 const RETRY_TIMEOUT = 1000;
 const RELOAD_TIMEOUT = 2000;
 
 const loadImage = () => {
-  imageElement.value.src = props.image+"?"+Date.now();
-  if(!loaded.value) {
-    imageElement.value.onerror = () => setTimeout(loadImage, RETRY_TIMEOUT)
-    imageElement.value.onload = function () {
-      loading.value = false;
-      loaded.value = true;
-      setTimeout(loadImage, RELOAD_TIMEOUT)
+  if (imageElement.value !== null) {
+    imageElement.value.src = props.image + "?" + Date.now();
+    if (!loaded.value) {
+      imageElement.value.onerror = () => setTimeout(loadImage, RETRY_TIMEOUT)
+      imageElement.value.onload = function () {
+        loading.value = false;
+        loaded.value = true;
+        setTimeout(loadImage, RELOAD_TIMEOUT)
+      }
     }
   }
 }

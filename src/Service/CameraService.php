@@ -13,9 +13,14 @@ class CameraService
         return '/stream/' . $streamId . '-still.jpg';
     }
 
-    public function makeSnapshot(): void
+    public function getStreamUrl(string $streamId): string
     {
-        $image = file_get_contents($this->snapshotApi);
+        return '/stream/' . $streamId . '-live.mjpg';
+    }
+
+    public function makeSnapshot(string $streamId): void
+    {
+        $image = file_get_contents($this->snapshotApi . '/' . $streamId . '-still.jpg');
         file_put_contents($this->snapshotDest, $image);
     }
 

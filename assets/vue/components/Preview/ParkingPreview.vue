@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ParkingForm from "../../../src/Model/ParkingForm";
 import Image from "../Preview/Image.vue";
 
 defineProps({

@@ -83,7 +83,9 @@ services:
     restart: always
     environment:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}
+      - PHP_IDE_CONFIG=PHPSTORM
       - VISION_API=${VISION_API}
+      - XDEBUG_MODE=${XDEBUG_MODE}
       - MERCURE_JWT_SECRET=${MERCURE_JWT_SECRET}
 volumes:
   caddy_data:

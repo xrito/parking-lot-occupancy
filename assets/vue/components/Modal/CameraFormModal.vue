@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import ParkingForm from "../../../src/Model/ParkingForm";
+import type ParkingForm from "../../../src/Model/ParkingForm";
 
 const form = ref({
   stream: "",
 } as ParkingForm);
 
-const closeButton = ref<HTMLButtonElement | null>(null);
-const formElement = ref<HTMLFormElement | null>(null);
+const closeButton = ref<HTMLButtonElement>();
+const formElement = ref<HTMLFormElement>();
 interface Props {
   id: string;
 }
@@ -18,7 +18,7 @@ interface Emits {
 
 const closeModal = function () {
   closeButton.value?.click();
-  formElement.value.reset();
+  formElement.value?.reset();
 }
 defineProps<Props>();
 defineEmits<Emits>();

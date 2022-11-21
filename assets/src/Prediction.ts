@@ -1,16 +1,10 @@
 import RectangleFactory from "./Factory/RectangleFactory";
+import {fabric} from "fabric";
 
-export default class Prediction extends fabric.Group{
+export default class Prediction extends fabric.Group {
     text;
-    rectangle;
-    /**
-     * @param {string} text
-     * @param {int} width
-     * @param {int} height
-     * @param {int} left
-     * @param {int} top
-     */
-    constructor(text,  width, height, left, top){
+
+    constructor(text: string, width: number, height: number, left: number, top: number) {
         const elements = RectangleFactory.create(text, width, height, 'green');
         super(elements, {
             left: left,

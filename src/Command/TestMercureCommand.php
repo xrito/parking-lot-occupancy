@@ -18,8 +18,8 @@ class TestMercureCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->hub->publish(new Update("/predictions", json_encode($this->parkingService->getCarPredictionAndSpot())));
-        $this->hub->publish(new Update("/freeSpots", json_encode($this->parkingService->getFreeSpots())));
+       // $this->hub->publish(new Update("/predictions", json_encode($this->parkingService->getCarPredictionAndSpot())));
+        $this->hub->publish(new Update("/freeSpots", json_encode($this->parkingService->getFreeSpots('63773e2fa3306531b40ff5cb'))));
         $output->writeln("Published");
         return 0;
     }

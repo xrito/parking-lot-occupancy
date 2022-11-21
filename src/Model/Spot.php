@@ -2,15 +2,21 @@
 
 namespace Parking\Model;
 
-class Spot implements RectangleInterface
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+
+#[ODM\EmbeddedDocument]
+class Spot implements RectangleInterface, \JsonSerializable
 {
 
     public function __construct(
+        #[ODM\Field(type: 'int')]
         private int $x,
+        #[ODM\Field(type: 'int')]
         private int $y,
+        #[ODM\Field(type: 'int')]
         private int $width,
-        private int $height)
-    {
+        #[ODM\Field(type: 'int')]
+        private int $height) {
     }
 
     public function isFree(RectangleInterface $prediction): bool
@@ -76,5 +82,10 @@ class Spot implements RectangleInterface
             'width' => $this->width,
             'height' => $this->height
         ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }

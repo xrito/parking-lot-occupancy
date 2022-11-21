@@ -28,10 +28,11 @@ class SpotService
     }
 
     /**
-     * @param Spot[] $spots
+     * @param string $id
+     * @param Spot $spots
      * @return void
      */
-    public function saveSpots(array $spots): void
+    public function saveSpots(string $id, array $spots): void
     {
         $inlineSpots = json_encode(array_map(fn(Spot $spot) => $spot->toArray(), $spots));
         file_put_contents($this->spotFilePath, $inlineSpots);

@@ -1,19 +1,28 @@
 <?php
+
 namespace Parking\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Parking\Model\Spot;
 
 #[ODM\Document]
-class Parking{
+class Parking
+{
 
     #[ODM\Id]
     private string $id;
+    #[ODM\EmbedMany(targetDocument: Spot::class)]
+    /**
+     * @return ArrayCollection|Spot[]
+     */
+    private ArrayCollection $spots;
 
     public function __construct(
         #[ODM\Field(type: 'string')]
-        private string $stream,
-    )
-    {
+        private string $stream
+    ) {
+        $this->spots = new ArrayCollection();
     }
 
     public function getId(): string
@@ -24,5 +33,22 @@ class Parking{
     public function getStream(): string
     {
         return $this->stream;
+    }
+
+    /**
+     * @param Spot[] $spots
+     * @return void
+     */
+    public function setSpots(array $spots): void
+    {
+        $this->spots = new ArrayCollection($spots);
+    }
+
+    /**
+     * @return ArrayCollection|Spot[]
+     */
+    public function getSpots(): ArrayCollection
+    {
+        return $this->spots;
     }
 }
