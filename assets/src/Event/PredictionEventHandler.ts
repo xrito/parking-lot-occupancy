@@ -3,27 +3,27 @@ import type PredictionDTO from "../Model/Prediction";
 import type {fabric} from "fabric";
 
 export default class PredictionEventHandler {
-    private eventSource: EventSource | null = null;
-    private predictions: Prediction[];
-    private canvas: fabric.Canvas;
-    private url: string | URL;
+    _eventSource: EventSource | null = null;
+    _predictions: Prediction[];
+    _canvas: fabric.Canvas;
+    _url: string | URL;
 
     constructor(url: string | URL, predictions: Prediction[], canvas: fabric.Canvas) {
-        this.url = url;
-        this.predictions = predictions;
-        this.canvas = canvas;
+        this._url = url;
+        this._predictions = predictions;
+        this._canvas = canvas;
     }
 
     public activate() {
-        this.eventSource = new EventSource(this.url)
-        this.eventSource.onmessage = this.handleMessage.bind(this);
+        this._eventSource = new EventSource(this._url)
+        this._eventSource.onmessage = this.handleMessage.bind(this);
     }
 
     public deactivate() {
-        if (this.eventSource) {
-            this.eventSource.close();
-            this.predictions.map(prediction => {
-                this.canvas.remove(prediction)
+        if (this._eventSource) {
+            this._eventSource.close();
+            this._predictions.map(prediction => {
+                this._canvas.remove(prediction)
             });
         }
     }
@@ -31,12 +31,12 @@ export default class PredictionEventHandler {
     private handleMessage(message: MessageEvent) {
         this.removeAllPredictionsFromCanvas()
         const predictions: PredictionDTO[] = JSON.parse(message.data);
-        predictions.map(this.addPredictionToCanvas)
+        predictions.map(this.addPredictionToCanvas.bind(this));
     }
 
     private removeAllPredictionsFromCanvas() {
-        this.predictions.map((prediction: Prediction) => {
-            this.canvas.remove(prediction)
+        this._predictions.map((prediction: Prediction) => {
+            this._canvas.remove(prediction)
         });
     }
 
@@ -47,7 +47,7 @@ export default class PredictionEventHandler {
             prediction.height,
             prediction.x,
             prediction.y);
-        this.predictions.push(predictionRect);
-        this.canvas.sendToBack(predictionRect);
+        this._predictions.push(predictionRect);
+        this._canvas.sendToBack(predictionRect);
     }
 }

@@ -17,6 +17,7 @@
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.9",
         "spatie/temporary-directory": "^2.1",
+        "symfony/cache": "6.0.*",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
@@ -35,8 +36,7 @@
         "symfony/ux-vue": "^2.5",
         "symfony/validator": "6.0.*",
         "symfony/webpack-encore-bundle": "^1.16",
-        "symfony/yaml": "6.0.*",
-        "ext-pcntl": "*"
+        "symfony/yaml": "6.0.*"
     },
     "config": {
         "allow-plugins": {

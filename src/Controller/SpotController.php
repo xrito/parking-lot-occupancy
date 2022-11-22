@@ -23,10 +23,4 @@ class SpotController extends AbstractController
         $this->parkingService->updateSpots($id, $spots);
         return new JsonResponse(['status' => 'ok']);
     }
-
-    #[Route('/api/spots/{id}', name: 'spots_list', options: ['expose' => true], methods: ['GET'])]
-    public function getSpots(): Response
-    {
-        return new JsonResponse(array_map(fn($spot) => $spot->toArray(), $this->spotService->getSpots()));
-    }
 }

@@ -4,6 +4,7 @@ import type {fabric} from "fabric";
 import PredictionEventHandler from "../Event/PredictionEventHandler";
 import SpotDTO from "../Model/Spot";
 import SpotRepository from "../Repository/SpotRepository";
+import Spot from "../Spot";
 
 export default class {
     readonly _cameraCanvas: fabric.Canvas;
@@ -54,25 +55,25 @@ export default class {
     }
 
     saveSpots() {
-         const spotsJson = this._spotCollection.toJson();
-         SpotRepository.update(this._id, spotsJson);
+        const spotsJson = this._spotCollection.toJson();
+        SpotRepository.update(this._id, spotsJson);
     }
 
     removeSpot() {
-        /*  const selectedObject = this.getCamera().getActiveObject();
-          if (selectedObject instanceof Spot) {
-              this.spotCollection.remove(selectedObject);
-              this.getCamera().remove(selectedObject);
-          }
-          if (selectedObject instanceof Array) {
-              selectedObject.map(object => {
-                  if (object instanceof Spot) {
-                      this.spotCollection.remove(object);
-                      this.getCamera().remove(object);
-                  }
-              })
-          }
-          this.saveSpots();*/
+        const selectedObject = this.getCamera().getActiveObject();
+        if (selectedObject instanceof Spot) {
+            this._spotCollection.remove(selectedObject);
+            this.getCamera().remove(selectedObject);
+        }
+        if (selectedObject instanceof Array) {
+            selectedObject.map(object => {
+                if (object instanceof Spot) {
+                    this._spotCollection.remove(object);
+                    this.getCamera().remove(object);
+                }
+            })
+        }
+        this.saveSpots();
     }
 
     public loadSpots() {

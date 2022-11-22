@@ -94,16 +94,16 @@ class ParkingService
         $spotDimension = $this->spotService->getSpotDimension();
         $predictionDimension = $spotDimension / $cameraDimension;
         array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $carPredictions);
-        $spotAvailability = $this->getSpotAvailability($carPredictions);
+        $spotAvailability = $this->getSpotAvailability($streamId, $carPredictions);
         $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
         return array_map(fn($spot) => $spot + 1, $freeSpotNumbers);
     }
 
-    public function drawSpotPredictions(): void
+    public function drawSpotPredictions(string $parkingId): void
     {
         $carPredictions = $this->visionService->detectCars($this->snapshotSrc);
         //$this->drawService->drawPredictions($this->snapshotSrc, $this->snapshotDest, $carPredictions);
-        $this->drawService->drawSpots($this->snapshotSrc, $this->snapshotDest, $this->spotService->getSpots());
+        $this->drawService->drawSpots($this->snapshotSrc, $this->snapshotDest, $this->spotService->getSpots($parkingId));
     }
 
     /**
@@ -117,7 +117,7 @@ class ParkingService
         $predictionDimension = $spotDimension / $cameraDimension;
         $predictions = array_values($this->visionService->detectCars($this->snapshotSrc));
         array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $predictions);
-        $spotAvailability = $this->getSpotAvailability($predictions);
+        $spotAvailability = $this->getSpotAvailability($streamId, $predictions);
         $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
         return $predictions;
     }
@@ -127,9 +127,9 @@ class ParkingService
      * @param array $predictions
      * @return bool[]
      */
-    private function getSpotAvailability(array $predictions): array
+    private function getSpotAvailability(string $parkingId, array $predictions): array
     {
-        $spots = $this->spotService->getSpots();
+        $spots = $this->spotService->getSpots($parkingId);
         $usedSpaces = [];
         foreach ($spots as $ind => $spot) {
             foreach ($predictions as $prediction) {

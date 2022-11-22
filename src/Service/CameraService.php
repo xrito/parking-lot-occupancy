@@ -2,20 +2,38 @@
 
 namespace Parking\Service;
 
+use Parking\Streaming\ConnectionStatusExtractor;
+
 class CameraService
 {
-    public function __construct(private string $snapshotApi, private string $snapshotDest)
+    public function __construct(
+        private string $snapshotApi,
+        private string $snapshotDest,
+        private string $entrypoint = '/stream')
     {
     }
 
+    public function isAvailableStream(string $id): bool
+    {
+        $statusHtml = file_get_contents($this->snapshotApi . '/status.html');
+        $connections = (new ConnectionStatusExtractor($statusHtml))->extract();
+        foreach ($connections as $connection) {
+            if ($connection->isStream() && $connection->getStreamId() === $id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public function getPreviewUrl(string $streamId): string
     {
-        return '/stream/' . $streamId . '-still.jpg';
+        return $this->entrypoint.'/' . $streamId . '-still.jpg';
     }
 
     public function getStreamUrl(string $streamId): string
     {
-        return '/stream/' . $streamId . '-live.mjpg';
+        return $this->entrypoint.'/' . $streamId . '-live.mjpg';
     }
 
     public function makeSnapshot(string $streamId): void
@@ -29,4 +47,5 @@ class CameraService
         $image = getimagesize($this->snapshotDest);
         return $image[0];
     }
+
 }

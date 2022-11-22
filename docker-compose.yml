@@ -31,7 +31,6 @@ services:
       - backend
     ports:
       - 80:80
-      - 9345:9345
     restart: unless-stopped
     container_name: frontend
   deepstack:

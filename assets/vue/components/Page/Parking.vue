@@ -11,6 +11,14 @@ const router = useRouter();
 const parking = ref<Parking>();
 const canvasElement = ref<HTMLCanvasElement>();
 let parkingService = ref<ParkingService>();
+const monitoringType = ref<string>();
+monitoringType.value = 'spot';
+
+const onSwitchMonitoringType = function () {
+  if(parkingService.value !== undefined) {
+    parkingService?.value.switchMonitoring(monitoringType.value!);
+  }
+}
 onMounted(async () => {
   const id: string = router.currentRoute.value.params.id.toString();
   parking.value = (await ParkingRepository.get(id)).data;
@@ -19,14 +27,10 @@ onMounted(async () => {
       id,
       parking.value.spots,
       cameraCanvas,
-      '/.well-known/mercure?topic=/freeSpots',
-      '/.well-known/mercure?topic=/freeSpots');
+      '/.well-known/mercure?topic=/parking/free_spots/' + id,
+      '/.well-known/mercure?topic=/parking/predictions/' + id);
   parkingService.value.loadSpots();
-  /*parking.value = (await ParkingRepository.get(id)).data;
-  spotCollection.value = new SpotCollection( );
-  canvas.add(new Spot(1, 100, 100, 100, 100));
-  const spotEventHandler = new SpotEventHandler(spotCollection.value, canvas);
-  spotEventHandler.activate('/.well-known/mercure?topic=/freeSpots');*/
+  parkingService.value.switchMonitoring(monitoringType.value!);
 });
 
 </script>
@@ -45,10 +49,12 @@ onMounted(async () => {
           <button type="button" @click="parkingService.removeSpot" class="btn btn-danger">Удалить</button>
         </div>
         <div class="btn-group-vertical" role="group">
-          <input type="radio" class="btn-check" name="show" value="prediction" id="vbtn-radio1" autocomplete="off"
+          <input type="radio" class="btn-check" @change="onSwitchMonitoringType" name="show" value="prediction"
+                 v-model="monitoringType" id="vbtn-radio1" autocomplete="off"
                  checked>
           <label class="btn btn-outline-primary" for="vbtn-radio1">Предсказание</label>
-          <input type="radio" class="btn-check" name="show" value="spot" id="vbtn-radio2" autocomplete="off">
+          <input type="radio" class="btn-check" @change="onSwitchMonitoringType" name="show" value="spot"
+                 v-model="monitoringType" id="vbtn-radio2" autocomplete="off">
           <label class="btn btn-outline-primary" for="vbtn-radio2">Места</label>
         </div>
       </div>

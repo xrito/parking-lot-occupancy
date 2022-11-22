@@ -2,39 +2,39 @@ import type SpotCollection from "../Model/SpotCollection";
 import type {fabric} from "fabric";
 
 export default class SpotEventHandler {
-    #eventSource?: EventSource;
-    #spotCollection: SpotCollection;
-    #canvas: fabric.Canvas;
+    _eventSource?: EventSource;
+    _spotCollection: SpotCollection;
+    _canvas: fabric.Canvas;
 
     constructor(spotCollection: SpotCollection, canvas: fabric.Canvas) {
-        this.#spotCollection = spotCollection;
-        this.#canvas = canvas;
+        this._spotCollection = spotCollection;
+        this._canvas = canvas;
     }
 
     activate(url: string | URL) {
         const eventSource = new EventSource(url)
-        eventSource.onmessage = this.#handleMessage.bind(this);
-        this.#eventSource = eventSource;
+        eventSource.onmessage = this.handleMessage.bind(this);
+        this._eventSource = eventSource;
 
-        this.#spotCollection.getAll().map(spot => {
+        this._spotCollection.getAll().map(spot => {
             spot.opacity = 1;
         });
-        this.#canvas.renderAll();
+        this._canvas.renderAll();
     }
 
     deactivate() {
-        this.#spotCollection.getAll().map(spot => {
+        this._spotCollection.getAll().map(spot => {
             spot.opacity = 0;
         });
-        if (this.#eventSource) {
-            this.#eventSource.close();
+        if (this._eventSource) {
+            this._eventSource.close();
         }
-        this.#canvas.renderAll();
+        this._canvas.renderAll();
     }
 
-    #handleMessage(message: MessageEvent) {
+    private handleMessage(message: MessageEvent) {
         const freeSpots = JSON.parse(message.data);
-        this.#spotCollection.freeSpots(freeSpots);
-        this.#canvas.renderAll();
+        this._spotCollection.freeSpots(freeSpots);
+        this._canvas.renderAll();
     }
 }

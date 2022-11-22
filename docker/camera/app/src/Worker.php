@@ -5,8 +5,10 @@ namespace Camera;
 use Camera\Message\JsonMessageSerializer;
 use Camera\Message\UpdateStreamConfig;
 use Camera\Service\ConfigService;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceiver;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -74,8 +76,19 @@ final class Worker
     {
         $bus = $this->createMessageBus();
         $receivers = $this->createReceivers();
-        $worker = new MessageWorker($receivers, $bus);
+        $eventDispatcher = $this->createEventDispatcher();
+        $worker = new MessageWorker($receivers, $bus, $eventDispatcher);
         $worker->run();
+    }
+
+    private function createEventDispatcher(): EventDispatcher{
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(WorkerRunningEvent::class, function () {
+            foreach ($this->streamProcesses as $streamProcess) {
+                $streamProcess->isRunning();
+            }
+        });
+        return $eventDispatcher;
     }
 
     private function createReceivers(): array
@@ -143,7 +156,11 @@ final class Worker
             );
             $this->logger->log('Starting stream: ' . $stream->getId());
             $this->streamProcesses[] = $ffmpegProcess;
-            $ffmpegProcess->start();
+
+            $ffmpegProcess->setPty(true);
+            $ffmpegProcess->start(function ($type, $buffer) use ($stream) {
+                $this->logger->log(['id' => $stream->getId(), 'message' => $buffer]);
+            });
         }
     }
 

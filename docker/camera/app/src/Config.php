@@ -39,7 +39,10 @@ final class Config
                 HTTPBindAddress $this->address
                 MaxHTTPConnections 2000
                 MaxClients 1000
-                MaxBandwidth 10000";
+                MaxBandwidth 10000
+                <Stream status.html>
+                Format status 
+                </Stream>";
     }
 
     private function getFeed(Stream $stream): string
