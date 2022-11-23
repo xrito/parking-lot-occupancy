@@ -21,6 +21,7 @@ services:
       - ./package.json:/var/www/html/package.json
       - ./package-lock.json:/var/www/html/package-lock.json
       - ./.env:/var/www/html/.env
+      - ./var/profile:/tmp/profile
       - ./assets:/var/www/html/assets
       - ./tests:/var/www/html/tests
       - ./templates:/var/www/html/templates

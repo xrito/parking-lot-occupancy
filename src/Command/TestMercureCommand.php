@@ -16,6 +16,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class TestMercureCommand extends Command
 {
+
+    private float $ttlInSeconds = 0.3;
     public function __construct(
         private HubInterface $hub,
         private DocumentManager $documentManager,
@@ -35,23 +37,26 @@ class TestMercureCommand extends Command
             $start = microtime(true);
             foreach ($parkingList as $parking) {
                 if ($this->cameraService->isAvailableStream($parking->getId())) {
+                    $predictions = $this->parkingService->getCarPredictions($parking->getId());
                     $this->hub->publish(
                         new Update(
                             "/parking/free_spots/{$parking->getId()}",
-                            json_encode($this->parkingService->getFreeSpots($parking->getId()))
+                            json_encode(
+                                $this->parkingService->getFreeSpotsByPredictions($parking->getId(), $predictions)
+                            )
                         )
                     );
                     $this->hub->publish(
                         new Update(
                             "/parking/predictions/{$parking->getId()}",
-                            json_encode($this->parkingService->getCarPredictionAndSpot($parking->getId()))
+                            json_encode($predictions)
                         )
                     );
                 }
             }
             $end = microtime(true);
             $output->writeln("Time: " . round(($end - $start) * 1000) . "ms");
-            usleep(300);
+            usleep($this->ttlInSeconds * 1000000);
         }
     }
 

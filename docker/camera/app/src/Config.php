@@ -76,11 +76,12 @@ final class Config
             "<Stream %s-%s>
                 Feed %s
                 Format %s
-                VideoFrameRate 2
+                VideoFrameRate 15
                 VideoSize %s                
                 VideoQMin 1
-                VideoQMax 15
-                VideoIntraOnly
+                VideoQMax 1
+                VideoIntraOnly               
+                VideoBitRate 1000
                 NoAudio
                 Strict -1
                 NoDefaults

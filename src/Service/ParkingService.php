@@ -86,17 +86,35 @@ class ParkingService
         return $parking->getId();
     }
 
-    public function getFreeSpots(string $streamId): array
+    public function getFreeSpotsById(string $streamId): array
     {
-        $this->cameraService->makeSnapshot($streamId);
-        $carPredictions = $this->visionService->detectCars($this->snapshotSrc);
-        $cameraDimension = $this->cameraService->getCameraDimension();
-        $spotDimension = $this->spotService->getSpotDimension();
-        $predictionDimension = $spotDimension / $cameraDimension;
-        array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $carPredictions);
+        $carPredictions = $this->getCarPredictions($streamId);
+        return $this->getFreeSpotsByPredictions($streamId, $carPredictions);
+    }
+
+    /**
+     * @param Prediction[] $carPredictions
+     * @return array
+     */
+    public function getFreeSpotsByPredictions(string $streamId, array $carPredictions): array
+    {
         $spotAvailability = $this->getSpotAvailability($streamId, $carPredictions);
         $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
         return array_map(fn($spot) => $spot + 1, $freeSpotNumbers);
+    }
+
+    /**
+     * @return Prediction[]
+     */
+    public function getCarPredictions(string $streamId): array
+    {
+        $this->cameraService->makeSnapshot($streamId);
+        $cameraDimension = $this->cameraService->getCameraDimension();
+        $spotDimension = $this->spotService->getSpotDimension();
+        $predictionDimension = $spotDimension / $cameraDimension;
+        $carPredictions = array_values($this->visionService->detectCars($this->snapshotSrc));
+        array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $carPredictions);
+        return $carPredictions;
     }
 
     public function drawSpotPredictions(string $parkingId): void
@@ -106,21 +124,6 @@ class ParkingService
         $this->drawService->drawSpots($this->snapshotSrc, $this->snapshotDest, $this->spotService->getSpots($parkingId));
     }
 
-    /**
-     * @return Prediction[]
-     */
-    public function getCarPredictionAndSpot(string $streamId): array
-    {
-        $this->cameraService->makeSnapshot($streamId);
-        $cameraDimension = $this->cameraService->getCameraDimension();
-        $spotDimension = $this->spotService->getSpotDimension();
-        $predictionDimension = $spotDimension / $cameraDimension;
-        $predictions = array_values($this->visionService->detectCars($this->snapshotSrc));
-        array_map(fn(Prediction $prediction) => $prediction->normalize($predictionDimension), $predictions);
-        $spotAvailability = $this->getSpotAvailability($streamId, $predictions);
-        $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
-        return $predictions;
-    }
 
 
     /**

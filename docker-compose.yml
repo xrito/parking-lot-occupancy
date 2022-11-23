@@ -32,6 +32,7 @@ services:
   deepstack:
     image: 'deepquestai/deepstack:gpu'
     environment:
+      - MODE=High
       - VISION-DETECTION=True
     container_name: deepstack
     restart: unless-stopped

@@ -38,7 +38,7 @@ class ParkingController extends AbstractController
             return new AlisaResponse($e->getMessage());
         }
         return new AlisaResponse(
-            "Свободные место под номером: " . implode(", ", $this->parkingService->getFreeSpots())
+            "Свободные место под номером: " . implode(", ", $this->parkingService->getFreeSpotsById())
         );
     }
 
