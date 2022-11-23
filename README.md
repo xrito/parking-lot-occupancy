@@ -47,3 +47,9 @@ Thats it! Wait for the following services to appear as Running or Healthy:
 - redis
 - deepstack
 - backend
+
+## Report Issues
+In case you are experiencing a bug or want to request a new feature head over to the [Parking Lot Occupancy Detection monorepo issue tracker](https://github.com/powernic/parking-lot-occupancy/issues)
+
+## License
+[MIT license](LICENSE)
