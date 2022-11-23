@@ -45,17 +45,17 @@ onMounted(async () => {
       </div>
       <div id="control" class="d-flex flex-column justify-content-between">
         <div class="btn-group-vertical">
-          <button type="button" @click="parkingService.addSpot" class="btn btn-success">Добавить место</button>
-          <button type="button" @click="parkingService.removeSpot" class="btn btn-danger">Удалить</button>
+          <button type="button" @click="parkingService.addSpot" class="btn btn-success">Add Spot</button>
+          <button type="button" @click="parkingService.removeSpot" class="btn btn-danger">Remove</button>
         </div>
         <div class="btn-group-vertical" role="group">
           <input type="radio" class="btn-check" @change="onSwitchMonitoringType" name="show" value="prediction"
                  v-model="monitoringType" id="vbtn-radio1" autocomplete="off"
                  checked>
-          <label class="btn btn-outline-primary" for="vbtn-radio1">Предсказание</label>
+          <label class="btn btn-outline-primary" for="vbtn-radio1">Prediction</label>
           <input type="radio" class="btn-check" @change="onSwitchMonitoringType" name="show" value="spot"
                  v-model="monitoringType" id="vbtn-radio2" autocomplete="off">
-          <label class="btn btn-outline-primary" for="vbtn-radio2">Места</label>
+          <label class="btn btn-outline-primary" for="vbtn-radio2">Spots</label>
         </div>
       </div>
     </div>

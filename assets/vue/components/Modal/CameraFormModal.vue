@@ -30,7 +30,7 @@ defineEmits<Emits>();
       <div class="modal-content">
         <form @submit.prevent="$emit('addParking', form, closeModal)" ref="formElement" method="post">
           <div class="modal-header">
-            <h1 class="modal-title fs-5">URL Адрес камеры</h1>
+            <h1 class="modal-title fs-5">Stream\Video Url</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" ref="closeButton"
                     aria-label="Close"></button>
           </div>
@@ -39,7 +39,7 @@ defineEmits<Emits>();
                    placeholder="http://192.168.0.1/stream2">
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Продолжить</button>
+            <button type="submit" class="btn btn-primary">Continue</button>
           </div>
         </form>
       </div>

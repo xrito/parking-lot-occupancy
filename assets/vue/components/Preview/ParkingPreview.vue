@@ -24,9 +24,9 @@ defineEmits<Emits>();
         <div class="d-flex justify-content-between align-items-center">
           <div class="btn-group">
             <RouterLink class="btn btn-sm btn-outline-secondary" :to="{ name: 'parking', params: {id: id } }">
-              Редактировать
+              Edit
             </RouterLink>
-            <button @click="$emit('removeParking', id)" type="button" class="btn btn-sm btn-outline-danger">Удалить
+            <button @click="$emit('removeParking', id)" type="button" class="btn btn-sm btn-outline-danger">Remove
             </button>
           </div>
         </div>
