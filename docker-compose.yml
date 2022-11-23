@@ -4,8 +4,6 @@ services:
     image: mongo:latest
     restart: always
     container_name: mongo
-    ports:
-      - 27017:27017
     volumes:
       - mongo:/data/db/
     environment:
@@ -19,14 +17,12 @@ services:
     build:
       context: .
       target: frontend
+    volumes:
+        - caddy_data:/data
+        - caddy_config:/config
     environment:
       MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
       MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
-    volumes:
-      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./public:/var/www/html/public
-      - caddy_data:/data
-      - caddy_config:/config
     depends_on:
       - backend
     ports:
@@ -52,40 +48,30 @@ services:
       target: camera
     container_name: camera
     restart: unless-stopped
-    volumes:
-      - ./docker/camera/app:/app
+    depends_on:
+      backend:
+        condition: service_healthy
     environment:
+      - FFSERVER_PORT=${FFSERVER_PORT}
       - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
   backend:
     hostname: 'backend'
     build:
       context: .
-      target: backend_dev
+      target: backend
     container_name: backend
-    volumes:
-      - ./config:/var/www/html/config
-      - ./vendor:/var/www/html/vendor
-      - ./src:/var/www/html/src
-      - ./public:/var/www/html/public
-      - ./composer.json:/var/www/html/composer.json
-      - ./composer.lock:/var/www/html/composer.lock
-      - ./package.json:/var/www/html/package.json
-      - ./package-lock.json:/var/www/html/package-lock.json
-      - ./.env:/var/www/html/.env
-      - ./assets:/var/www/html/assets
-      - ./tests:/var/www/html/tests
-      - ./templates:/var/www/html/templates
-      - ./node_modules:/var/www/html/node_modules
-      - ./phpunit.xml.dist:/var/www/html/phpunit.xml.dist
-      - ./webpack.config.js:/var/www/html/webpack.config.js
-      - ./var:/var/www/html/var
     restart: always
     environment:
-      - ENABLE_XDEBUG=${ENABLE_XDEBUG}
-      - PHP_IDE_CONFIG=PHPSTORM
+      - APP_ENV=prod
       - VISION_API=${VISION_API}
-      - XDEBUG_MODE=${XDEBUG_MODE}
+      - SNAPSHOT_API=${SNAPSHOT_API}
+      - APP_SECRET=${APP_SECRET}
       - MERCURE_JWT_SECRET=${MERCURE_JWT_SECRET}
+      - MERCURE_URL=${MERCURE_URL}
+      - MERCURE_PUBLIC_URL=${MERCURE_PUBLIC_URL}
+      - MONGODB_URL=${MONGODB_URL}
+      - MONGODB_DB=${MONGODB_DB}
+      - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
 volumes:
   caddy_data:
   caddy_config:

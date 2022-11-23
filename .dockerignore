@@ -5,3 +5,14 @@ docker/camera/app/vendor
 .env.local
 .env.local.php
 .env.test
+/node_modules/
+/public/build/
+/.git
+/.idea
+/docker-compose.*.yml
+/tests
+/phpunit.xml.dist
+/Dockerfile
+/.gitignore
+/dockerignore
+/var

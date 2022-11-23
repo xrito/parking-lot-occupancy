@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 
 const RETRY_TIMEOUT = 1000;
 const RELOAD_TIMEOUT = 2000;
@@ -27,12 +27,10 @@ const loadImage = () => {
 const imageElement = ref<HTMLImageElement | null>(null);
 const loading = ref(true);
 const loaded = ref(false);
-const props = defineProps({
-  image: {
-    type: String,
-    required: true
-  }
-})
+interface Props {
+  image: string;
+}
+const props = defineProps<Props>()
 onMounted(loadImage);
 </script>
 

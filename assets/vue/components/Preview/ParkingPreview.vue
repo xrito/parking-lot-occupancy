@@ -1,21 +1,18 @@
 <script setup lang="ts">
 import Image from "../Preview/Image.vue";
 
-defineProps({
-  id: {
-    type: String,
-    required: true
-  },
-  preview: {
-    type: String,
-    required: true
-  }
-})
+interface Props {
+  id: string;
+  preview: string;
+}
+
+defineProps<Props>()
 
 
 interface Emits {
   (e: 'removeParking', id: string): void
 }
+
 defineEmits<Emits>();
 </script>
 
@@ -29,7 +26,8 @@ defineEmits<Emits>();
             <RouterLink class="btn btn-sm btn-outline-secondary" :to="{ name: 'parking', params: {id: id } }">
               Редактировать
             </RouterLink>
-            <button @click="$emit('removeParking', id)" type="button" class="btn btn-sm btn-outline-danger">Удалить</button>
+            <button @click="$emit('removeParking', id)" type="button" class="btn btn-sm btn-outline-danger">Удалить
+            </button>
           </div>
         </div>
       </div>

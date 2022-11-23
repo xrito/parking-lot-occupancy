@@ -97,7 +97,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
-COPY composer.* symfony.* ./
+COPY --chown=www-data:www-data  composer.* symfony.* ./
 
 RUN set -eux; \
     if [ -f composer.json ]; then \
@@ -105,23 +105,33 @@ RUN set -eux; \
 		composer clear-cache; \
     fi
 
-# copy sources
-COPY . .
+COPY --chown=www-data:www-data . .
+
 RUN rm -Rf docker/
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
+	chown www-data. var/cache var/log; \
     if [ -f composer.json ]; then \
 		composer dump-autoload --classmap-authoritative --no-dev; \
 		composer dump-env prod; \
-#		composer run-script --no-dev post-install-cmd; \
+		composer run-script --no-dev post-install-cmd; \
 		chmod +x bin/console; sync; \
     fi
 
-ENTRYPOINT ["docker-entrypoint"]
+RUN set -eux; \
+    if [ -f package.json ]; then \
+		npm install; \
+        npm run build; sync; \
+        rm -rf assets \
+        && rm -rf node_modules; \
+    fi
 
-FROM backend as backend_dev
-RUN rm -f .env.local.php
+COPY docker/backend/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
+RUN chmod +x /usr/local/bin/docker-healthcheck
+
+HEALTHCHECK --interval=3s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
+ENTRYPOINT ["docker-entrypoint"]
 
 FROM caddy:${CADDY_VERSION}-builder-alpine AS app_caddy_builder
 
@@ -134,6 +144,7 @@ RUN xcaddy build \
 FROM caddy:${CADDY_VERSION} AS frontend
 
 COPY --from=app_caddy_builder /usr/bin/caddy /usr/bin/caddy
+COPY --from=backend /var/www/html/public /var/www/html/public
 WORKDIR /var/www/html
 
 COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
@@ -177,14 +188,15 @@ RUN rm /usr/local/bin/php-cgi  \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+COPY --from=jrottenberg/ffmpeg:3-scratch / /
+COPY docker/camera/app /app
+WORKDIR /app
 RUN set -eux; \
     if [ -f composer.json ]; then \
 		composer install --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress; \
 		composer clear-cache; \
+        composer dump-autoload --classmap-authoritative --no-dev; \
     fi
 
-COPY --from=jrottenberg/ffmpeg:3-scratch / /
-COPY docker/camera/app /app
-WORKDIR /app
-HEALTHCHECK CMD netstat -an | grep 8090 > /dev/null; if [ 0 != $? ]; then exit 1; fi;
+HEALTHCHECK CMD netstat -an | grep $FFSERVER_PORT > /dev/null; if [ 0 != $? ]; then exit 1; fi;
 ENTRYPOINT ["php", "/app/worker.php"]

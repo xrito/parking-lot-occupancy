@@ -10,7 +10,7 @@ final class Config
      */
     public function __construct(
         private array $streams,
-        private int $port = 8090,
+        private int $port,
         private string $address = '0.0.0.0',
         private string $feedPath = '/tmp',
         private string $size = '640x360',

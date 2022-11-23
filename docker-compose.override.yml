@@ -1,0 +1,34 @@
+name: parking
+services:
+  mongo:
+    ports:
+      - 27017:27017
+  frontend:
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./public:/var/www/html/public
+  camera:
+    volumes:
+      - ./docker/camera/app:/app
+  backend:
+    volumes:
+      - ./config:/var/www/html/config
+      - ./vendor:/var/www/html/vendor
+      - ./src:/var/www/html/src
+      - ./public:/var/www/html/public
+      - ./composer.json:/var/www/html/composer.json
+      - ./composer.lock:/var/www/html/composer.lock
+      - ./package.json:/var/www/html/package.json
+      - ./package-lock.json:/var/www/html/package-lock.json
+      - ./.env:/var/www/html/.env
+      - ./assets:/var/www/html/assets
+      - ./tests:/var/www/html/tests
+      - ./templates:/var/www/html/templates
+      - ./node_modules:/var/www/html/node_modules
+      - ./phpunit.xml.dist:/var/www/html/phpunit.xml.dist
+      - ./webpack.config.js:/var/www/html/webpack.config.js
+    environment:
+      - APP_ENV=dev
+      - ENABLE_XDEBUG=${ENABLE_XDEBUG}
+      - PHP_IDE_CONFIG=PHPSTORM
+      - XDEBUG_MODE=${XDEBUG_MODE}

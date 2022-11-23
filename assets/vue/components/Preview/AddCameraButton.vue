@@ -1,10 +1,9 @@
 <script setup lang="ts">
-defineProps({
-  modalId: {
-    type: String,
-    required: true
-  },
-})
+interface Props {
+  modalId: string;
+}
+
+defineProps<Props>()
 </script>
 <template>
   <div class="col">

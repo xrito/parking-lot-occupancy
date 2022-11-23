@@ -18,21 +18,22 @@ use Symfony\Component\Process\Process;
 final class Worker
 {
 
-    private Logger $logger;
-
+    private string $ffserverDSN;
     /**
      * @param ConfigService $configService
      * @param Process[] $streamProcesses
      * @param ?Process $ffServerProcess
-     * @param string $ffserver
+     * @param string $ffServerHost
      */
     public function __construct(
+        private Logger $logger,
         private ConfigService $configService,
+        private int $ffServerPort,
+        private string $ffServerHost = 'http://127.0.0.1',
         private array $streamProcesses = [],
-        private ?Process $ffServerProcess = null,
-        private string $ffserver = 'http://127.0.0.1:8090')
+        private ?Process $ffServerProcess = null)
     {
-        $this->logger = new Logger();
+        $this->ffserverDSN = sprintf('%s:%d', $this->ffServerHost, $this->ffServerPort);
     }
 
     public function sigHandler(int $signo): void
@@ -140,7 +141,7 @@ final class Worker
     private function runFFStreams(array $streams): void
     {
         foreach ($streams as $stream) {
-            $feedUrl = $this->ffserver . '/' . $stream->getName();
+            $feedUrl = $this->ffserverDSN . '/' . $stream->getName();
             $ffmpegProcess = new Process(
                 [
                     "ffmpeg",
