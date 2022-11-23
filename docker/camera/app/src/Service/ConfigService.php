@@ -9,7 +9,7 @@ class ConfigService
 {
     public function __construct(
         private int $ffServerPort,
-        private string $streamApi = 'http://frontend/api/streams',
+        private string $streamApi = 'http://http/api/streams',
         private string $ffServerFile = '/etc/ffserver.conf')
     {
     }
