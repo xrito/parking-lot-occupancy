@@ -141,7 +141,7 @@ RUN xcaddy build \
 	--with github.com/dunglas/vulcain \
 	--with github.com/dunglas/vulcain/caddy
 
-FROM caddy:${CADDY_VERSION} AS frontend
+FROM caddy:${CADDY_VERSION} AS http
 
 COPY --from=app_caddy_builder /usr/bin/caddy /usr/bin/caddy
 COPY --from=backend /var/www/html/public /var/www/html/public

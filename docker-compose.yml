@@ -16,7 +16,7 @@ services:
   http:
     build:
       context: .
-      target: frontend
+      target: http
     volumes:
         - caddy_data:/data
         - caddy_config:/config
@@ -28,7 +28,7 @@ services:
     ports:
       - 80:80
     restart: unless-stopped
-    container_name: frontend
+    container_name: http
   deepstack:
     image: 'deepquestai/deepstack:gpu'
     environment:

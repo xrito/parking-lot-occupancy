@@ -42,7 +42,7 @@ $ docker-compose up -d
 ```
 
 Thats it! Wait for the following services to appear as Running or Healthy:
-- frontend
+- http
 - camera
 - redis
 - deepstack
