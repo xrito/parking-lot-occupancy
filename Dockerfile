@@ -1,5 +1,6 @@
 ARG CADDY_VERSION=2
-FROM php:8.0.24-fpm-alpine3.15 AS backend
+ARG PHP_VERSION=8.1
+FROM php:${PHP_VERSION}-fpm-alpine3.15 AS backend
 # persistent / runtime deps
 RUN apk add --no-cache \
     --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community \
@@ -149,7 +150,7 @@ WORKDIR /var/www/html
 
 COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
 
-FROM php:8.0.24-cli-alpine AS camera
+FROM php:${PHP_VERSION}-cli-alpine AS camera
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \

@@ -2,7 +2,7 @@ import type {fabric} from "fabric";
 
 export default abstract class {
 
-    intervalId: number | null = null;
+    intervalId: NodeJS.Timer | null = null;
     _canvas: fabric.Canvas;
     _url: string | URL;
     _ttl: number;

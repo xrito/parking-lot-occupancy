@@ -41,9 +41,7 @@ class VisionService
 
     public function detectCarsAsync(string $imageFilePath): PromiseInterface
     {
-        return $this->detectAsync($imageFilePath)->then(
-            fn(array $predictions) => $this->filterPredictionsByCar($predictions)
-        );
+        return $this->detectAsync($imageFilePath)->then($this->filterPredictionsByCar(...));
     }
 
     /**

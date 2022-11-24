@@ -27,7 +27,7 @@ class ParkingService
     public function getParkingPreviews(): array
     {
         $parkingList = $this->documentManager->getRepository(Parking::class)->findAll();
-        return array_map(fn(Parking $parking) => $this->createParkingPreview($parking), $parkingList);
+        return array_map($this->createParkingPreview(...), $parkingList);
     }
 
     public function getParking(string $id): ?array
