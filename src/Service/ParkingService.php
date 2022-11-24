@@ -3,6 +3,7 @@
 namespace Parking\Service;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use GuzzleHttp\Promise\PromiseInterface;
 use Parking\Document\Parking;
 use Parking\Message\UpdateStreamConfig;
 use Parking\Model\Prediction;
@@ -86,6 +87,10 @@ class ParkingService
         return $parking->getId();
     }
 
+    /**
+     * @param string $streamId
+     * @return int[]
+     */
     public function getFreeSpotsById(string $streamId): array
     {
         $carPredictions = $this->getCarPredictions($streamId);
@@ -94,13 +99,18 @@ class ParkingService
 
     /**
      * @param Prediction[] $carPredictions
-     * @return array
+     * @return int[]
      */
     public function getFreeSpotsByPredictions(string $streamId, array $carPredictions): array
     {
         $spotAvailability = $this->getSpotAvailability($streamId, $carPredictions);
         $freeSpotNumbers = array_keys(array_filter($spotAvailability, fn(bool $isAvailable) => $isAvailable));
         return array_map(fn($spot) => $spot + 1, $freeSpotNumbers);
+    }
+
+    public function getCarPredictionsAsync(string $streamId): PromiseInterface
+    {
+        return $this->visionService->detectCarsAsync($this->snapshotSrc);
     }
 
     /**

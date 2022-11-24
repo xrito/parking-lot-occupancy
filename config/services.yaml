@@ -3,7 +3,6 @@ parameters:
   default_font: '%public_dir%/Montserrat.otf'
   snapshot.src: '%public_dir%/snapshot.jpg'
   snapshot.dest: '%public_dir%/prediction.jpg'
-  spots.src: '%public_dir%/spots.json'
   env(MONGODB_URL): ''
   env(MONGODB_DB): ''
 
@@ -41,7 +40,3 @@ services:
   Parking\Service\DrawService:
     arguments:
       $fontPath: '%default_font%'
-
-  Parking\Service\SpotService:
-    arguments:
-      $spotFilePath: '%spots.src%'

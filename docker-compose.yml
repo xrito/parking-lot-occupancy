@@ -34,7 +34,7 @@ services:
     environment:
       - MODE=High
       - VISION-DETECTION=True
-    container_name: deepstack
+    init: true
     restart: unless-stopped
     deploy:
       resources:

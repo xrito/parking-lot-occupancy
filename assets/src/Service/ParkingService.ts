@@ -13,21 +13,22 @@ export default class {
     _predictions = [];
     _spotEventHandler: SpotEventHandler;
     _predictionEventHandler: PredictionEventHandler;
-    _freeSpotsUrl: string | URL;
     _id: string;
+    _ttl: number;
 
     constructor(id: string,
                 spots: SpotDTO[],
                 cameraCanvas: fabric.Canvas,
+                ttl: number,
                 freeSpotsUrl: string | URL,
                 predictionUrl: string | URL) {
         this._spots = spots;
         this._id = id;
-        this._freeSpotsUrl = freeSpotsUrl;
+        this._ttl = ttl;
         this._cameraCanvas = cameraCanvas;
         this._cameraCanvas.on('object:modified', this.saveSpots.bind(this));
-        this._spotEventHandler = new SpotEventHandler(this._spotCollection, this.getCamera());
-        this._predictionEventHandler = new PredictionEventHandler(predictionUrl, this._predictions, this.getCamera());
+        this._spotEventHandler = new SpotEventHandler(this._spotCollection, freeSpotsUrl, this.getCamera(), ttl);
+        this._predictionEventHandler = new PredictionEventHandler(this._predictions, predictionUrl, this.getCamera(), ttl);
     }
 
 
@@ -35,10 +36,15 @@ export default class {
         return this._cameraCanvas;
     }
 
+    deactivate() {
+        this._spotEventHandler.deactivate();
+        this._predictionEventHandler.deactivate();
+    }
+
     switchMonitoring(monitoringType: string) {
         switch (monitoringType) {
             case 'spot':
-                this._spotEventHandler.activate(this._freeSpotsUrl);
+                this._spotEventHandler.activate();
                 this._predictionEventHandler.deactivate();
                 break;
             case 'prediction':

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import type Parking from "../../../src/Model/Parking";
 import type SpotCollection from "../../../src/Model/SpotCollection";
 import ParkingService from "../../../src/Service/ParkingService";
@@ -23,16 +23,20 @@ onMounted(async () => {
   const id: string = router.currentRoute.value.params.id.toString();
   parking.value = (await ParkingRepository.get(id)).data;
   const cameraCanvas = new fabric.Canvas(canvasElement.value!);
+  const ttl = 300;
   parkingService.value = new ParkingService(
       id,
       parking.value.spots,
       cameraCanvas,
-      '/.well-known/mercure?topic=/parking/free_spots/' + id,
-      '/.well-known/mercure?topic=/parking/predictions/' + id);
+      ttl,
+      '/api/detection/spots/' + id,
+      '/api/detection/predictions/' + id);
   parkingService.value.loadSpots();
   parkingService.value.switchMonitoring(monitoringType.value!);
 });
-
+onUnmounted(() => {
+  parkingService.value?.deactivate();
+});
 </script>
 <template>
   <div class="container py-5">

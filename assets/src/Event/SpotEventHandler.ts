@@ -1,40 +1,36 @@
 import type SpotCollection from "../Model/SpotCollection";
 import type {fabric} from "fabric";
+import DetectionEventHandler from "./DetectionEventHandler";
 
-export default class SpotEventHandler {
-    _eventSource?: EventSource;
+export default class SpotEventHandler extends DetectionEventHandler {
     _spotCollection: SpotCollection;
-    _canvas: fabric.Canvas;
 
-    constructor(spotCollection: SpotCollection, canvas: fabric.Canvas) {
+    constructor(
+        spotCollection: SpotCollection,
+        url: string | URL,
+        canvas: fabric.Canvas,
+        ttl: number,) {
+        super(url, canvas, ttl);
         this._spotCollection = spotCollection;
-        this._canvas = canvas;
     }
 
-    activate(url: string | URL) {
-        const eventSource = new EventSource(url)
-        eventSource.onmessage = this.handleMessage.bind(this);
-        this._eventSource = eventSource;
-
+    protected onActivate(): void {
         this._spotCollection.getAll().map(spot => {
             spot.opacity = 1;
         });
         this._canvas.renderAll();
     }
 
-    deactivate() {
-        this._spotCollection.getAll().map(spot => {
-            spot.opacity = 0;
-        });
-        if (this._eventSource) {
-            this._eventSource.close();
-        }
-        this._canvas.renderAll();
-    }
-
-    private handleMessage(message: MessageEvent) {
-        const freeSpots = JSON.parse(message.data);
+    protected handleMessage(freeSpots: number[]): void {
         this._spotCollection.freeSpots(freeSpots);
         this._canvas.renderAll();
     }
+
+    protected onDeactivate(): void {
+        this._spotCollection.getAll().map(spot => {
+            spot.opacity = 0;
+        });
+        this._canvas.renderAll();
+    }
+
 }

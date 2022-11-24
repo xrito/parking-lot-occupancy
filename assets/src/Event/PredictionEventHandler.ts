@@ -1,36 +1,27 @@
 import Prediction from "../Prediction";
 import type PredictionDTO from "../Model/Prediction";
 import type {fabric} from "fabric";
+import DetectionEventHandler from "./DetectionEventHandler";
 
-export default class PredictionEventHandler {
-    _eventSource: EventSource | null = null;
+export default class PredictionEventHandler extends DetectionEventHandler {
     _predictions: Prediction[];
-    _canvas: fabric.Canvas;
-    _url: string | URL;
 
-    constructor(url: string | URL, predictions: Prediction[], canvas: fabric.Canvas) {
-        this._url = url;
+    constructor(predictions: Prediction[],
+                url: string | URL,
+                canvas: fabric.Canvas,
+                ttl: number) {
+        super(url, canvas, ttl);
         this._predictions = predictions;
-        this._canvas = canvas;
     }
 
-    public activate() {
-        this._eventSource = new EventSource(this._url)
-        this._eventSource.onmessage = this.handleMessage.bind(this);
+    protected onDeactivate(): void {
+        this._predictions.map(prediction => {
+            this._canvas.remove(prediction)
+        });
     }
 
-    public deactivate() {
-        if (this._eventSource) {
-            this._eventSource.close();
-            this._predictions.map(prediction => {
-                this._canvas.remove(prediction)
-            });
-        }
-    }
-
-    private handleMessage(message: MessageEvent) {
+    protected handleMessage(predictions: PredictionDTO[]) {
         this.removeAllPredictionsFromCanvas()
-        const predictions: PredictionDTO[] = JSON.parse(message.data);
         predictions.map(this.addPredictionToCanvas.bind(this));
     }
 

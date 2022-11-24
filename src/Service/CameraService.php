@@ -2,6 +2,7 @@
 
 namespace Parking\Service;
 
+use Imagick;
 use Parking\Streaming\ConnectionStatusExtractor;
 
 class CameraService
@@ -28,13 +29,14 @@ class CameraService
 
     public function getPreviewUrl(string $streamId): string
     {
-        return $this->entrypoint.'/' . $streamId . '-still.jpg';
+        return $this->entrypoint . '/' . $streamId . '-still.jpg';
     }
 
     public function getStreamUrl(string $streamId): string
     {
-        return $this->entrypoint.'/' . $streamId . '-live.mjpg';
+        return $this->entrypoint . '/' . $streamId . '-live.mjpg';
     }
+
 
     public function makeSnapshot(string $streamId): void
     {

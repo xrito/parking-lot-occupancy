@@ -10,7 +10,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 class SpotService
 {
     public function __construct(
-        private string $spotFilePath,
         private DocumentManager $documentManager,
         private SerializerInterface $serializer)
     {
