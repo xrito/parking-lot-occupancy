@@ -60,26 +60,26 @@ class ParkingController extends AbstractController
         );
     }
 
-    #[Route('/api/parking', name: 'parking_all', methods: ['GET'])]
+    #[Route('/api/parking', name: 'parking_all', options: ['expose' => true], methods: ['GET'])]
     public function getAllParking(Request $request): JsonResponse
     {
         return new JsonResponse($this->parkingService->getParkingPreviews());
     }
 
-    #[Route('/api/parking/{id}', name: 'parking_one', methods: ['GET'])]
+    #[Route('/api/parking/{id}', name: 'parking_one', options: ['expose' => true], methods: ['GET'])]
     public function getParking(string $id): JsonResponse
     {
         return new JsonResponse($this->parkingService->getParking($id));
     }
 
-    #[Route('/api/parking/{id}', name: 'parking_remove', methods: ['DELETE'])]
+    #[Route('/api/parking/{id}', name: 'parking_remove', options: ['expose' => true], methods: ['DELETE'])]
     public function removeParking(string $id): Response
     {
         $this->parkingService->removeParking($id);
         return new JsonResponse('ok');
     }
 
-    #[Route('/api/parking', name: 'parking_create', methods: ['POST'])]
+    #[Route('/api/parking', name: 'parking_create', options: ['expose' => true], methods: ['POST'])]
     public function addParking(Request $request): Response
     {
         $contentType = $request->getContentType();
