@@ -27,7 +27,7 @@ class ParkingService
     public function getParkingPreviews(): array
     {
         $parkingList = $this->documentManager->getRepository(Parking::class)->findAll();
-        return array_map(fn(Parking $parking) => $this->createParkingPreview($parking->getId()), $parkingList);
+        return array_map(fn(Parking $parking) => $this->createParkingPreview($parking), $parkingList);
     }
 
     public function getParking(string $id): ?array
@@ -37,17 +37,19 @@ class ParkingService
             return null;
         }
         return array_merge(
-            $this->createParkingPreview($id),
-            ['spots' => $parking->getSpots()->toArray()]);
+            $this->createParkingPreview($parking),
+            [
+                'spots' => $parking->getSpots()->toArray()]);
     }
 
 
-    public function createParkingPreview(string $id): array
+    public function createParkingPreview(Parking $parking): array
     {
         return [
-            "id" => $id,
-            "preview" => $this->cameraService->getPreviewUrl($id),
-            'stream' => $this->cameraService->getStreamUrl($id),
+            "id" => $parking->getId(),
+            'name' => $parking->getName(),
+            "preview" => $this->cameraService->getPreviewUrl($parking->getId()),
+            'stream' => $this->cameraService->getStreamUrl($parking->getId()),
         ];
     }
 
@@ -78,9 +80,8 @@ class ParkingService
         $this->documentManager->flush();
     }
 
-    public function addParking(string $stream): string
+    public function addParking(Parking $parking): string
     {
-        $parking = new Parking($stream);
         $this->documentManager->persist($parking);
         $this->documentManager->flush();
         $this->bus->dispatch(new UpdateStreamConfig($parking->getId()));

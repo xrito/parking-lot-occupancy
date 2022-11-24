@@ -18,8 +18,8 @@ services:
     resource: '../src/'
     exclude:
       - '../src/DependencyInjection/'
-      - '../src/{Model,Entity,Message}/'
-      - '../src/**/{Model,Message}/'
+      - '../src/{Model,Entity,Message,Document}/'
+      - '../src/**/{Model,Message,Document}/'
       - '../src/Kernel.php'
 
 

@@ -3,6 +3,7 @@ import Image from "../Preview/Image.vue";
 
 interface Props {
   id: string;
+  name: string;
   preview: string;
 }
 
@@ -22,6 +23,7 @@ defineEmits<Emits>();
       <Image :image="preview"/>
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title">{{ name }}</h5>
           <div class="btn-group">
             <RouterLink class="btn btn-sm btn-outline-secondary" :to="{ name: 'parking', params: {id: id } }">
               Edit

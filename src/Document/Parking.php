@@ -5,6 +5,7 @@ namespace Parking\Document;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Parking\Model\Spot;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document]
 class Parking
@@ -20,6 +21,11 @@ class Parking
 
     public function __construct(
         #[ODM\Field(type: 'string')]
+        #[Assert\NotBlank(message: 'Name is required')]
+        private string $name,
+        #[ODM\Field(type: 'string')]
+        #[Assert\NotBlank(message: 'Stream url is required')]
+        #[Assert\Url(message: 'Stream url is not valid', protocols: ['rtsp', 'rtmp', 'http', 'https'])]
         private string $stream
     ) {
         $this->spots = new ArrayCollection();
@@ -50,5 +56,13 @@ class Parking
     public function getSpots(): ArrayCollection
     {
         return $this->spots;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name ?? $this->getId();
     }
 }

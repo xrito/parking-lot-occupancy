@@ -94,21 +94,19 @@ class ParkingController extends AbstractController
             default:
                 return new Response('Unsupported content type', 400);
         }
-        $errors = $this->validator->validate(
-            $data['stream'],
-            [
-                new NotBlank(),
-                new Url(
-                    protocols: ['rtsp', 'rtmp', 'http', 'https']
-                )
-            ]
-        );
-
+        $parking = new Parking($data['name'], $data['stream']);
+        $errors = $this->validator->validate($parking);
         if (count($errors) > 0) {
-            $errorsString = (string)$errors;
-            return new Response($errorsString);
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = [
+                    'field' => $error->getPropertyPath(),
+                    'message' => $error->getMessage()
+                ];
+            }
+            return new JsonResponse($errorMessages, 400);
         }
-        $id = $this->parkingService->addParking($data['stream']);
-        return new JsonResponse($this->parkingService->createParkingPreview($id));
+        $id = $this->parkingService->addParking($parking);
+        return new JsonResponse($this->parkingService->createParkingPreview($parking));
     }
 }

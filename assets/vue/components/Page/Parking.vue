@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
-import {onMounted, onUnmounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import type Parking from "../../../src/Model/Parking";
 import type SpotCollection from "../../../src/Model/SpotCollection";
 import ParkingService from "../../../src/Service/ParkingService";
 import ParkingRepository from "../../../src/Repository/ParkingRepository";
 import {fabric} from "fabric";
+import {useMeta} from "vue-meta";
 
 const router = useRouter();
 const parking = ref<Parking>();
@@ -13,14 +14,15 @@ const canvasElement = ref<HTMLCanvasElement>();
 let parkingService = ref<ParkingService>();
 const monitoringType = ref<string>();
 monitoringType.value = 'spot';
+const id: string = router.currentRoute.value.params.id.toString();
+const title = 'Parking ' + id
 
 const onSwitchMonitoringType = function () {
-  if(parkingService.value !== undefined) {
+  if (parkingService.value !== undefined) {
     parkingService?.value.switchMonitoring(monitoringType.value!);
   }
 }
 onMounted(async () => {
-  const id: string = router.currentRoute.value.params.id.toString();
   parking.value = (await ParkingRepository.get(id)).data;
   const cameraCanvas = new fabric.Canvas(canvasElement.value!);
   const ttl = 300;
@@ -37,9 +39,14 @@ onMounted(async () => {
 onUnmounted(() => {
   parkingService.value?.deactivate();
 });
+const meta = computed(() => ({
+  title: parking.value?.name || 'Parking '  + id,
+}));
+useMeta(meta);
 </script>
 <template>
   <div class="container py-5">
+    <h1 class="display-5 fw-bold">Parking {{ parking?.name }}</h1>
     <div class="d-flex flex-row">
       <div class="col">
         <div id="camera" style="width: 640px;height: 360px">
