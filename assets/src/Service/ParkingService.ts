@@ -7,49 +7,57 @@ import SpotRepository from "../Repository/SpotRepository";
 import Spot from "../Spot";
 
 export default class {
-    readonly _cameraCanvas: fabric.Canvas;
     _spotCollection = new SpotCollection();
-    _spots: SpotDTO[];
     _predictions = [];
-    _spotEventHandler: SpotEventHandler;
-    _predictionEventHandler: PredictionEventHandler;
     _id: string;
     _ttl: number;
+    _freeSpotsTopic: string;
+    _predictionTopic: string;
+    _cameraCanvas?: fabric.Canvas;
+    _spotEventHandler?: SpotEventHandler;
+    _predictionEventHandler?: PredictionEventHandler;
 
     constructor(id: string,
-                spots: SpotDTO[],
-                cameraCanvas: fabric.Canvas,
                 ttl: number,
                 freeSpotsTopic: string,
                 predictionTopic: string) {
-        this._spots = spots;
         this._id = id;
         this._ttl = ttl;
-        this._cameraCanvas = cameraCanvas;
-        this._cameraCanvas.on('object:modified', this.saveSpots.bind(this));
-        this._spotEventHandler = new SpotEventHandler(this._spotCollection, freeSpotsTopic, this.getCamera(), ttl);
-        this._predictionEventHandler = new PredictionEventHandler(this._predictions, predictionTopic, this.getCamera(), ttl);
+        this._freeSpotsTopic = freeSpotsTopic;
+        this._predictionTopic = predictionTopic;
     }
 
+    public init(camera: fabric.Canvas, spots: SpotDTO[], monitoringType: string) {
+        this.setCamera(camera);
+        this._spotEventHandler = new SpotEventHandler(this._spotCollection, this._freeSpotsTopic, this.getCamera()!, this._ttl);
+        this._predictionEventHandler = new PredictionEventHandler(this._predictions, this._predictionTopic, this.getCamera()!, this._ttl);
+        this.loadSpots(spots);
+        this.switchMonitoring(monitoringType);
+    }
 
-    getCamera(): fabric.Canvas {
+    private setCamera(camera: fabric.Canvas) {
+        this._cameraCanvas = camera;
+        this._cameraCanvas.on('object:modified', this.saveSpots.bind(this));
+    }
+
+    public getCamera(): fabric.Canvas | undefined {
         return this._cameraCanvas;
     }
 
-    deactivate() {
-        this._spotEventHandler.deactivate();
-        this._predictionEventHandler.deactivate();
+    public deactivate() {
+        this._spotEventHandler!.deactivate();
+        this._predictionEventHandler!.deactivate();
     }
 
-    switchMonitoring(monitoringType: string) {
+    public switchMonitoring(monitoringType: string) {
         switch (monitoringType) {
             case 'spot':
-                this._spotEventHandler.activate();
-                this._predictionEventHandler.deactivate();
+                this._spotEventHandler!.activate();
+                this._predictionEventHandler!.deactivate();
                 break;
             case 'prediction':
-                this._predictionEventHandler.activate();
-                this._spotEventHandler.deactivate();
+                this._predictionEventHandler!.activate();
+                this._spotEventHandler!.deactivate();
                 break;
         }
     }
@@ -57,7 +65,8 @@ export default class {
     addSpot() {
         const spotDTO = new SpotDTO(80, 50, 100, 100);
         const spot = this._spotCollection.add(spotDTO);
-        this.getCamera().add(spot);
+        this.getCamera()!.add(spot);
+        this.saveSpots();
     }
 
     saveSpots() {
@@ -66,26 +75,26 @@ export default class {
     }
 
     removeSpot() {
-        const selectedObject = this.getCamera().getActiveObject();
+        const selectedObject = this.getCamera()!.getActiveObject();
         if (selectedObject instanceof Spot) {
             this._spotCollection.remove(selectedObject);
-            this.getCamera().remove(selectedObject);
+            this.getCamera()!.remove(selectedObject);
         }
         if (selectedObject instanceof Array) {
             selectedObject.map(object => {
                 if (object instanceof Spot) {
                     this._spotCollection.remove(object);
-                    this.getCamera().remove(object);
+                    this.getCamera()!.remove(object);
                 }
             })
         }
         this.saveSpots();
     }
 
-    public loadSpots() {
-        for (const spotDTO of this._spots) {
+    private loadSpots(spots: SpotDTO[],) {
+        for (const spotDTO of spots) {
             const spot = this._spotCollection.add(spotDTO);
-            this._cameraCanvas.add(spot)
+            this._cameraCanvas!.add(spot)
         }
     }
 
