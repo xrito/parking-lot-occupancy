@@ -10,27 +10,24 @@ export default class {
     _spotCollection = new SpotCollection();
     _predictions = [];
     _id: string;
-    _ttl: number;
     _freeSpotsTopic: string;
     _predictionTopic: string;
     _cameraCanvas?: fabric.Canvas;
     _spotEventHandler?: SpotEventHandler;
     _predictionEventHandler?: PredictionEventHandler;
 
-    constructor(id: string,
-                ttl: number,
+    constructor(id: string, 
                 freeSpotsTopic: string,
                 predictionTopic: string) {
         this._id = id;
-        this._ttl = ttl;
         this._freeSpotsTopic = freeSpotsTopic;
         this._predictionTopic = predictionTopic;
     }
 
     public init(camera: fabric.Canvas, spots: SpotDTO[], monitoringType: string) {
         this.setCamera(camera);
-        this._spotEventHandler = new SpotEventHandler(this._spotCollection, this._freeSpotsTopic, this.getCamera()!, this._ttl);
-        this._predictionEventHandler = new PredictionEventHandler(this._predictions, this._predictionTopic, this.getCamera()!, this._ttl);
+        this._spotEventHandler = new SpotEventHandler(this._spotCollection, this._freeSpotsTopic, this.getCamera()!);
+        this._predictionEventHandler = new PredictionEventHandler(this._predictions, this._predictionTopic, this.getCamera()!);
         this.loadSpots(spots);
         this.switchMonitoring(monitoringType);
     }

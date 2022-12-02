@@ -5,11 +5,9 @@ export default abstract class {
     intervalId: NodeJS.Timer | null = null;
     _canvas: fabric.Canvas;
     _url: string | URL;
-    _ttl: number;
     _eventSource: EventSource | null = null;
 
-    protected constructor(topic: string, canvas: fabric.Canvas, ttl: number) {
-        this._ttl = ttl;
+    protected constructor(topic: string, canvas: fabric.Canvas) {
         this._url = topic;
         this._canvas = canvas;
     }

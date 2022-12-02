@@ -8,9 +8,8 @@ export default class PredictionEventHandler extends DetectionEventHandler {
 
     constructor(predictions: Prediction[],
                 topic: string,
-                canvas: fabric.Canvas,
-                ttl: number) {
-        super(topic, canvas, ttl);
+                canvas: fabric.Canvas) {
+        super(topic, canvas);
         this._predictions = predictions;
     }
 

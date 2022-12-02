@@ -8,9 +8,8 @@ export default class SpotEventHandler extends DetectionEventHandler {
     constructor(
         spotCollection: SpotCollection,
         topic: string,
-        canvas: fabric.Canvas,
-        ttl: number,) {
-        super(topic, canvas, ttl);
+        canvas: fabric.Canvas ) {
+        super(topic, canvas);
         this._spotCollection = spotCollection;
     }
 

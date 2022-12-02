@@ -16,7 +16,6 @@ const id: string = router.currentRoute.value.params.id.toString();
 
 const parkingService = new ParkingService(
     id,
-    300,
     '/parking/free_spots/' + id,
     '/parking/predictions/' + id);
 
