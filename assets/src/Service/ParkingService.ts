@@ -16,7 +16,7 @@ export default class {
     _spotEventHandler?: SpotEventHandler;
     _predictionEventHandler?: PredictionEventHandler;
 
-    constructor(id: string, 
+    constructor(id: string,
                 freeSpotsTopic: string,
                 predictionTopic: string) {
         this._id = id;
@@ -34,6 +34,13 @@ export default class {
 
     private setCamera(camera: fabric.Canvas) {
         this._cameraCanvas = camera;
+        this._cameraCanvas.selection = false;
+        this._cameraCanvas.on('object:scaling', (e) => {
+            console.log(e);
+           if(e.target instanceof Spot) {
+                e.target.onScaling();
+           }
+        })
         this._cameraCanvas.on('object:modified', this.saveSpots.bind(this));
     }
 
@@ -59,19 +66,32 @@ export default class {
         }
     }
 
-    addSpot() {
+    public addSpot() {
         const spotDTO = new SpotDTO(80, 50, 100, 100);
         const spot = this._spotCollection.add(spotDTO);
         this.getCamera()!.add(spot);
         this.saveSpots();
     }
 
-    saveSpots() {
+    public saveSpots() {
         const spotsJson = this._spotCollection.toJson();
         SpotRepository.update(this._id, spotsJson);
     }
 
-    removeSpot() {
+    public clear() {
+        const spots = this
+            .getCamera()!
+            .getObjects()
+            .filter(object => object instanceof Spot) as Spot[];
+        spots.map((spot: Spot) => {
+            this._spotCollection.remove(spot);
+            this.getCamera()!.remove(spot);
+        });
+
+        this.saveSpots();
+    }
+
+    public removeSpot() {
         const selectedObject = this.getCamera()!.getActiveObject();
         if (selectedObject instanceof Spot) {
             this._spotCollection.remove(selectedObject);

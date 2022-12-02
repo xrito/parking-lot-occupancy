@@ -1,4 +1,5 @@
 import {fabric} from "fabric";
+fabric.Object.prototype.noScaleCache = false;
 
 export default class RectangleFactory {
     static create(title: string, width: number, height: number, color: string = 'red') {
@@ -9,9 +10,9 @@ export default class RectangleFactory {
             height: height,
             stroke: color,
             fill: 'transparent',
-            strokeWidth: 1
+            strokeWidth: 1,
+            strokeUniform: true
         });
-
         const text = new fabric.Text(title, {
             left: 0,
             top: 0,
@@ -19,7 +20,6 @@ export default class RectangleFactory {
             backgroundColor: color,
             fontSize: 15,
         });
-
         return [rect, text];
     }
 }

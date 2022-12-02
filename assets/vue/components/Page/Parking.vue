@@ -55,6 +55,7 @@ useMeta(meta);
       <ToolBar
           :default-monitoring-type="defaultMonitoringType"
           @switchMonitoring="switchMonitoring"
+          @clear="parkingService.clear()"
           @addSpot="parkingService.addSpot()"
           @removeSpot="parkingService.removeSpot()"/>
     </div>

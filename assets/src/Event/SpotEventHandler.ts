@@ -14,9 +14,7 @@ export default class SpotEventHandler extends DetectionEventHandler {
     }
 
     protected onActivate(): void {
-        this._spotCollection.getAll().map(spot => {
-            spot.opacity = 1;
-        });
+        this._spotCollection.getAll().map(spot => spot.show());
         this._canvas.renderAll();
     }
 
@@ -26,9 +24,7 @@ export default class SpotEventHandler extends DetectionEventHandler {
     }
 
     protected onDeactivate(): void {
-        this._spotCollection.getAll().map(spot => {
-            spot.opacity = 0;
-        });
+        this._spotCollection.getAll().map(spot => spot.hide());
         this._canvas.renderAll();
     }
 
