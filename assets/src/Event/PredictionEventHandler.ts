@@ -7,10 +7,10 @@ export default class PredictionEventHandler extends DetectionEventHandler {
     _predictions: Prediction[];
 
     constructor(predictions: Prediction[],
-                url: string | URL,
+                topic: string,
                 canvas: fabric.Canvas,
                 ttl: number) {
-        super(url, canvas, ttl);
+        super(topic, canvas, ttl);
         this._predictions = predictions;
     }
 

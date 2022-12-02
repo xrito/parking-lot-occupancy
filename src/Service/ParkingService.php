@@ -111,7 +111,8 @@ class ParkingService
 
     public function getCarPredictionsAsync(string $streamId): PromiseInterface
     {
-        return $this->visionService->detectCarsAsync($this->snapshotSrc);
+        $snapshot = $this->cameraService->getSnapshot($streamId );
+        return $this->visionService->detectCarsAsync($snapshot);
     }
 
     /**

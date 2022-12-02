@@ -7,10 +7,10 @@ export default class SpotEventHandler extends DetectionEventHandler {
 
     constructor(
         spotCollection: SpotCollection,
-        url: string | URL,
+        topic: string,
         canvas: fabric.Canvas,
         ttl: number,) {
-        super(url, canvas, ttl);
+        super(topic, canvas, ttl);
         this._spotCollection = spotCollection;
     }
 

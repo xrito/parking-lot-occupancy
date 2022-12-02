@@ -31,8 +31,8 @@ onMounted(async () => {
       parking.value.spots,
       cameraCanvas,
       ttl,
-      '/api/detection/spots/' + id,
-      '/api/detection/predictions/' + id);
+      '/parking/free_spots/' + id,
+      '/parking/predictions/' + id);
   parkingService.value.loadSpots();
   parkingService.value.switchMonitoring(monitoringType.value!);
 });
@@ -50,7 +50,7 @@ useMeta(meta);
     <div class="d-flex flex-row">
       <div class="col">
         <div id="camera" style="width: 640px;height: 360px">
-          <img :src="parking?.stream" width="640" height="360">
+          <img :src="parking?.stream" width="640" height="360" >
           <canvas ref="canvasElement" width="640" height="360"></canvas>
         </div>
       </div>

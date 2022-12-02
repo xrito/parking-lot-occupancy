@@ -4,6 +4,7 @@ namespace Parking\Service;
 
 use Imagick;
 use Parking\Streaming\ConnectionStatusExtractor;
+use SplFileObject;
 
 class CameraService
 {
@@ -37,6 +38,14 @@ class CameraService
         return $this->entrypoint . '/' . $streamId . '-live.mjpg';
     }
 
+    /**
+     * @param string $streamId
+     * @return resource
+     */
+    public function getSnapshot(string $streamId)
+    {
+        return fopen($this->snapshotApi . '/' . $streamId . '-still.jpg', 'r');
+    }
 
     public function makeSnapshot(string $streamId): void
     {

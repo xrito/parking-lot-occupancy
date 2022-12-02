@@ -6,15 +6,19 @@ export default abstract class {
     _canvas: fabric.Canvas;
     _url: string | URL;
     _ttl: number;
+    _eventSource: EventSource | null = null;
 
-    protected constructor(url: string | URL, canvas: fabric.Canvas, ttl: number) {
+    protected constructor(topic: string, canvas: fabric.Canvas, ttl: number) {
         this._ttl = ttl;
-        this._url = url;
+        this._url = topic;
         this._canvas = canvas;
     }
 
     public activate(): void {
-        this.intervalId = setInterval(this.fetch.bind(this), this._ttl);
+        this._eventSource = new EventSource(globalThis.MERCURE_URL + this._url, {
+            withCredentials: true
+        })
+        this._eventSource.onmessage = (message) => this.handleMessage(JSON.parse(message.data));
         this.onActivate();
     }
 
@@ -22,8 +26,8 @@ export default abstract class {
     }
 
     public deactivate(): void {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
+        if (this._eventSource) {
+            this._eventSource.close();
             this.onDeactivate();
         }
     }
@@ -31,11 +35,6 @@ export default abstract class {
     protected onDeactivate(): void {
     }
 
-    private fetch() {
-        fetch(this._url)
-            .then(response => response.json())
-            .then(this.handleMessage.bind(this));
-    }
 
     protected abstract handleMessage(message: any): void;
 

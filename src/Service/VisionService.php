@@ -7,6 +7,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Parking\Model\DetectionResponse;
 use Parking\Model\Prediction;
 use Psr\Http\Message\ResponseInterface;
+use SplFileObject;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -39,9 +40,13 @@ class VisionService
         return $this->filterPredictionsByCar($predictions);
     }
 
-    public function detectCarsAsync(string $imageFilePath): PromiseInterface
+    /**
+     * @param resource $snapshot
+     * @return PromiseInterface
+     */
+    public function detectCarsAsync($snapshot): PromiseInterface
     {
-        return $this->detectAsync($imageFilePath)->then($this->filterPredictionsByCar(...));
+        return $this->detectAsync($snapshot)->then($this->filterPredictionsByCar(...));
     }
 
     /**
@@ -50,14 +55,19 @@ class VisionService
      */
     private function filterPredictionsByCar(array $predictions): array
     {
-        return array_filter($predictions, fn(Prediction $prediction) => $prediction->isCar());
+        return array_values(
+            array_filter(
+                $predictions,
+                fn(Prediction $prediction) => $prediction->isCar()
+            )
+        );
     }
 
     /**
-     * @param string $imageFilePath
+     * @param resource $snapshot
      * @return PromiseInterface
      */
-    public function detectAsync(string $imageFilePath): PromiseInterface
+    public function detectAsync($snapshot): PromiseInterface
     {
         $promise = $this->client->postAsync($this->visionApi, [
             'multipart' => [
@@ -67,18 +77,19 @@ class VisionService
                 ],
                 [
                     'name' => 'image',
-                    'contents' => fopen($imageFilePath, 'r'),
+                    'contents' => $snapshot,
                 ],
             ],
         ]);
         return $promise->then(
             function (ResponseInterface $response): array {
+                /** @var DetectionResponse $detectionResponse */
                 $detectionResponse = $this->serializer->deserialize(
                     $response->getBody()->getContents(),
                     DetectionResponse::class,
                     'json'
                 );
-                return [];
+                return $detectionResponse->predictions;
             },
             function ($exception) {
                 return [];

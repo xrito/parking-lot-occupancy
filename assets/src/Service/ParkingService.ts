@@ -20,15 +20,15 @@ export default class {
                 spots: SpotDTO[],
                 cameraCanvas: fabric.Canvas,
                 ttl: number,
-                freeSpotsUrl: string | URL,
-                predictionUrl: string | URL) {
+                freeSpotsTopic: string,
+                predictionTopic: string) {
         this._spots = spots;
         this._id = id;
         this._ttl = ttl;
         this._cameraCanvas = cameraCanvas;
         this._cameraCanvas.on('object:modified', this.saveSpots.bind(this));
-        this._spotEventHandler = new SpotEventHandler(this._spotCollection, freeSpotsUrl, this.getCamera(), ttl);
-        this._predictionEventHandler = new PredictionEventHandler(this._predictions, predictionUrl, this.getCamera(), ttl);
+        this._spotEventHandler = new SpotEventHandler(this._spotCollection, freeSpotsTopic, this.getCamera(), ttl);
+        this._predictionEventHandler = new PredictionEventHandler(this._predictions, predictionTopic, this.getCamera(), ttl);
     }
 
 

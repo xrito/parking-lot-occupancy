@@ -1,4 +1,9 @@
 {% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script> window.MERCURE_URL = '{{ mercure('', {subscribe:'*'}) }}'</script>
+{% endblock %}
 {% block body %}
     <main id="app" class="d-flex flex-nowrap"></main>
 {% endblock %}
