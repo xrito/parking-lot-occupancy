@@ -7,6 +7,7 @@ import ParkingRepository from "../../../src/Repository/ParkingRepository";
 import {fabric} from "fabric";
 import {useMeta} from "vue-meta";
 import ToolBar from "../Parking/ToolBar.vue";
+import LazyImage from "../Preview/LazyImage.vue";
 
 const router = useRouter();
 const parking = ref<Parking>();
@@ -44,11 +45,11 @@ useMeta(meta);
 </script>
 <template>
   <div class="container py-5">
-    <h1 class="display-5 fw-bold">Parking {{ parking?.name }}</h1>
+    <h1 class="display-5 fw-bold">{{  meta.title }}</h1>
     <div class="d-flex flex-row">
       <div class="col">
         <div id="camera" :style="{ width: size.width+'px', height: size.height+'px'}">
-          <img :src="parking?.stream" :width="size.width" :height="size.height">
+          <LazyImage class="camera-image" v-if="parking?.stream" :src="parking?.stream" :width="size.width" :height="size.height"/>
           <canvas ref="canvasElement" :width="size.width" :height="size.height"></canvas>
         </div>
       </div>
@@ -71,7 +72,7 @@ useMeta(meta);
   margin: 0;
 }
 
-#camera img {
+#camera .camera-image {
   max-width: 100%;
   display: block;
   position: absolute;
