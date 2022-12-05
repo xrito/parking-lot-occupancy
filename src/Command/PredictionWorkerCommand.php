@@ -3,14 +3,12 @@
 namespace Parking\Command;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Utils;
 use Parking\Document\Parking;
 use Parking\Model\Prediction;
 use Parking\Service\CameraService;
 use Parking\Service\MercureHubService;
 use Parking\Service\ParkingService;
-use Parking\Service\VisionService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,9 +17,10 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class TestMercureCommand extends Command
+class PredictionWorkerCommand extends Command
 {
 
+    private bool $shouldContinue = true;
     private float $ttlInSeconds = 0.3;
     private string $freeSpotTopic = '/parking/free_spots/';
     private string $predictionTopic = '/parking/predictions/';
@@ -33,17 +32,20 @@ class TestMercureCommand extends Command
         private ParkingService $parkingService,
         private CameraService $cameraService)
     {
-        parent::__construct("mercure:test");
+        parent::__construct("prediction:worker");
     }
+
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $progressBar = new ProgressBar($output);
-        $progressBar->setFormat('%message%');
+        $progressBar->setFormat("%message%");
+        $progressBar->setMessage("Worker started");
 
         foreach ($progressBar->iterate($this->detectFreeSpots()) as $message) {
             $progressBar->setMessage($message);
         }
+
         return Command::SUCCESS;
     }
 
@@ -68,7 +70,7 @@ class TestMercureCommand extends Command
                 fn(Parking $parking) => in_array($parking->getId(), $listenedParkingIds)
             );
             $this->detectAsync($listenedParkingList);
-            $event  = $stopwatch->stop('detectFreeSpots');
+            $event = $stopwatch->stop('detectFreeSpots');
             if (!$first) {
                 $min = min($min, $event->getDuration());
                 $max = max($max, $event->getDuration());
@@ -85,7 +87,7 @@ class TestMercureCommand extends Command
                     )
                 );
             } else {
-                yield "Waiting...";
+                yield "Waiting...\r\n";
             }
             usleep($this->ttlInSeconds * 1000000);
         }
@@ -102,7 +104,7 @@ class TestMercureCommand extends Command
             if (str_starts_with($subscription['topic'], $this->freeSpotTopic)) {
                 $parkingId = str_replace($this->freeSpotTopic, '', $subscription['topic']);
                 $listenedParkingIds[] = $parkingId;
-            }elseif (str_starts_with($subscription['topic'], $this->predictionTopic)) {
+            } elseif (str_starts_with($subscription['topic'], $this->predictionTopic)) {
                 $parkingId = str_replace($this->predictionTopic, '', $subscription['topic']);
                 $listenedParkingIds[] = $parkingId;
             }

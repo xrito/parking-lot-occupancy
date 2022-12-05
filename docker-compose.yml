@@ -56,6 +56,7 @@ services:
       - FFSERVER_PORT=${FFSERVER_PORT}
       - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
   backend:
+    &backend
     hostname: 'backend'
     build:
       context: .
@@ -73,6 +74,16 @@ services:
       - MONGODB_URL=${MONGODB_URL}
       - MONGODB_DB=${MONGODB_DB}
       - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
+  prediction_worker:
+    <<: *backend
+    hostname: 'prediction_worker'
+    container_name: prediction_worker
+    init: true
+    healthcheck:
+      disable: true
+    build:
+      context: .
+      target: prediction_worker
 volumes:
   caddy_data:
   caddy_config:

@@ -11,6 +11,7 @@ services:
     volumes:
       - ./docker/camera/app:/app
   backend:
+    &backend
     volumes:
       - ./config:/var/www/html/config
       - ./vendor:/var/www/html/vendor
@@ -33,3 +34,5 @@ services:
       - ENABLE_XDEBUG=${ENABLE_XDEBUG}
       - PHP_IDE_CONFIG=PHPSTORM
       - XDEBUG_MODE=${XDEBUG_MODE}
+  prediction_worker:
+    <<: *backend

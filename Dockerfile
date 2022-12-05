@@ -1,5 +1,6 @@
 ARG CADDY_VERSION=2
 ARG PHP_VERSION=8.1
+ARG NODE_VERSION=18.6
 FROM php:${PHP_VERSION}-fpm-alpine3.15 AS backend
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -41,6 +42,7 @@ RUN set -eux; \
 		openssl-dev \
 	; \
 	\
+	docker-php-ext-configure pcntl --enable-pcntl; \
 	docker-php-ext-configure zip; \
 	docker-php-ext-configure gd\
           --with-freetype \
@@ -56,6 +58,7 @@ RUN set -eux; \
         mysqli \
         pdo_mysql \
         sockets \
+        pcntl \
 	; \
 	pecl install \
 		apcu-${APCU_VERSION} \
@@ -134,6 +137,9 @@ RUN chmod +x /usr/local/bin/docker-healthcheck
 HEALTHCHECK --interval=3s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 ENTRYPOINT ["docker-entrypoint"]
 
+FROM backend as prediction_worker
+ENTRYPOINT ["bin/console", "prediction:worker", "-n"]
+
 FROM caddy:${CADDY_VERSION}-builder-alpine AS app_caddy_builder
 
 RUN xcaddy build \
@@ -201,3 +207,17 @@ RUN set -eux; \
 
 HEALTHCHECK CMD netstat -an | grep $FFSERVER_PORT > /dev/null; if [ 0 != $? ]; then exit 1; fi;
 ENTRYPOINT ["php", "/app/worker.php"]
+
+FROM node:${NODE_VERSION}-alpine as frontend
+WORKDIR /var/www/html
+COPY ./assets ./assets
+COPY ./package.json ./package.json
+COPY ./package-lock.json ./package-lock.json
+RUN set -eux; \
+    if [ -f package.json ]; then \
+		npm install; \
+        npm run build; sync; \
+        rm -rf assets \
+        && rm -rf node_modules; \
+    fi
+ENTRYPOINT  ["npm","run","watch"]
