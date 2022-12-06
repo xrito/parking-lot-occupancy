@@ -1,6 +1,23 @@
 ARG CADDY_VERSION=2
 ARG PHP_VERSION=8.1
 ARG NODE_VERSION=18.6
+
+FROM node:${NODE_VERSION}-alpine as frontend
+WORKDIR /var/www/html
+COPY ./assets ./assets
+COPY ./public/js ./public/js
+COPY ./webpack.config.js ./webpack.config.js
+COPY ./package.json ./package.json
+COPY ./package-lock.json ./package-lock.json
+RUN set -eux; \
+    if [ -f package.json ]; then \
+		npm install; \
+        npm run build; \
+    fi
+EXPOSE 8080
+ENTRYPOINT  ["npm","run","dev-server", "--", "--port", "8080", "--host", "0.0.0.0",  "--public", "http://127.0.0.1:8080"]
+
+
 FROM php:${PHP_VERSION}-fpm-alpine3.15 AS backend
 # persistent / runtime deps
 RUN apk add --no-cache \
@@ -89,8 +106,6 @@ RUN set -eux; \
 	\
 	apk del .build-deps
 
-COPY --from=jrottenberg/ffmpeg:3-scratch / /
-
 WORKDIR /var/www/html
 COPY docker/backend/php-fpm.d/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 
@@ -123,16 +138,11 @@ RUN set -eux; \
 		chmod +x bin/console; sync; \
     fi
 
-RUN set -eux; \
-    if [ -f package.json ]; then \
-		npm install; \
-        npm run build; sync; \
-        rm -rf assets \
-        && rm -rf node_modules; \
-    fi
-
 COPY docker/backend/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
 RUN chmod +x /usr/local/bin/docker-healthcheck
+
+RUN bin/console fos:js-routing:dump --format=json --target=public/js/fos_js_routes.json
+COPY --from=frontend /var/www/html/public/build ./public/build
 
 HEALTHCHECK --interval=3s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 ENTRYPOINT ["docker-entrypoint"]
@@ -207,17 +217,3 @@ RUN set -eux; \
 
 HEALTHCHECK CMD netstat -an | grep $FFSERVER_PORT > /dev/null; if [ 0 != $? ]; then exit 1; fi;
 ENTRYPOINT ["php", "/app/worker.php"]
-
-FROM node:${NODE_VERSION}-alpine as frontend
-WORKDIR /var/www/html
-COPY ./assets ./assets
-COPY ./package.json ./package.json
-COPY ./package-lock.json ./package-lock.json
-RUN set -eux; \
-    if [ -f package.json ]; then \
-		npm install; \
-        npm run build; sync; \
-        rm -rf assets \
-        && rm -rf node_modules; \
-    fi
-ENTRYPOINT  ["npm","run","watch"]

@@ -16,7 +16,9 @@ services:
       - ./config:/var/www/html/config
       - ./vendor:/var/www/html/vendor
       - ./src:/var/www/html/src
-      - ./public:/var/www/html/public
+      - ./public/index.php:/var/www/html/public/index.php
+      - ./public/js:/var/www/html/public/js
+      - frontend_build:/var/www/html/public/build
       - ./composer.json:/var/www/html/composer.json
       - ./composer.lock:/var/www/html/composer.lock
       - ./package.json:/var/www/html/package.json
@@ -36,3 +38,17 @@ services:
       - XDEBUG_MODE=${XDEBUG_MODE}
   prediction_worker:
     <<: *backend
+  frontend:
+    hostname: frontend
+    container_name: frontend
+    ports:
+      - 8080:8080
+    build:
+      context: .
+      target: frontend
+    volumes:
+      - ./assets:/var/www/html/assets
+      - frontend_build:/var/www/html/public/build
+
+volumes:
+  frontend_build:

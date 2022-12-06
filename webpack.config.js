@@ -47,7 +47,6 @@ Encore
     // .configureBabel((config) => {
     //     config.plugins.push('@babel/a-babel-plugin');
     // })
-    .addPlugin(new FosRouting())
     // enables and configure @babel/preset-env polyfills
     .configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
