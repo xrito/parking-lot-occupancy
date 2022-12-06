@@ -16,10 +16,6 @@ export default class Spot extends fabric.Group {
             width: width,
             height: height,
         });
-        this.on('selection:updated', (e) => {
-            const activeSelection = e.target
-            console.log(e);
-        });
         this.controls.mtr.visible = false;
         this.lockScalingFlip = true;
         this.number = number;

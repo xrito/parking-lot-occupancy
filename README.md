@@ -26,6 +26,7 @@ App is made up of the following components:
 - Backend - Web interface for managing parking lots and cameras
 - Http - Web server
 - Deepstack - Vehicle Detection API
+- Prediction Worker - Worker that processes images from camera and sends predictions to UI
 - Camera - Converts RTSP stream to MJPEG for streaming in browser
 
 ## Running
@@ -48,6 +49,7 @@ Thats it! Wait for the following services to appear as Running or Healthy:
 - redis
 - deepstack
 - backend
+- prediction-worker
 
 ## Report Issues
 In case you are experiencing a bug or want to request a new feature head over to the [Parking Lot Occupancy Detection monorepo issue tracker](https://github.com/powernic/parking-lot-occupancy/issues)

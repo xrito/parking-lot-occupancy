@@ -40,7 +40,6 @@ const title = 'Parking ' + id
 const meta = computed(() => ({
   title: parking.value?.name || title,
 }));
-
 useMeta(meta);
 </script>
 <template>

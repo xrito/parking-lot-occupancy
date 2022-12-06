@@ -36,7 +36,6 @@ export default class {
         this._cameraCanvas = camera;
         this._cameraCanvas.selection = false;
         this._cameraCanvas.on('object:scaling', (e) => {
-            console.log(e);
            if(e.target instanceof Spot) {
                 e.target.onScaling();
            }

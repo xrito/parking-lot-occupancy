@@ -1,33 +1,41 @@
-
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onBeforeUnmount, onMounted, onUnmounted, ref} from "vue";
 
 const RETRY_TIMEOUT = 1000;
-
+const imageLoaded = () => {
+  loading.value = false;
+  loaded.value = true;
+}
+const tryLoadImage = () => {
+  setTimeout(loadImage, RETRY_TIMEOUT)
+}
 const loadImage = () => {
   if (imageElement.value !== null) {
     imageElement.value.src = props.src + "?" + Date.now();
     if (!loaded.value) {
-      imageElement.value.onerror = () => {
-        setTimeout(loadImage, RETRY_TIMEOUT)
-      }
-      imageElement.value.onload = function () {
-        loading.value = false;
-        loaded.value = true;
-      }
+      imageElement.value.onerror = tryLoadImage;
+      imageElement.value.onload = imageLoaded;
     }
+  }
+}
+const stopStreamLoading = () => {
+  if (imageElement.value !== null) {
+    imageElement.value!.src = "";
   }
 }
 const imageElement = ref<HTMLImageElement | null>(null);
 const loading = ref(true);
 const loaded = ref(false);
+
 interface Props {
   src: string;
   width: number;
   height: number;
 }
+
 const props = defineProps<Props>()
 onMounted(loadImage);
+onBeforeUnmount(stopStreamLoading);
 </script>
 
 <template>
