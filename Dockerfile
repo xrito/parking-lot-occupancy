@@ -141,7 +141,6 @@ RUN set -eux; \
 COPY docker/backend/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
 RUN chmod +x /usr/local/bin/docker-healthcheck
 
-RUN bin/console fos:js-routing:dump --format=json --target=public/js/fos_js_routes.json
 COPY --from=frontend /var/www/html/public/build ./public/build
 
 HEALTHCHECK --interval=3s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
