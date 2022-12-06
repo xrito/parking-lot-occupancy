@@ -59,7 +59,7 @@ Full Api documentation is available at http://localhost/api/doc/ in Swagger UI i
 | --- |---|--------|
 | /api/detection/spots/{id} | Returns the list of numbers available free spots for a parking | GET    |
 | /api/detection/get_detection_predictions | Returns the list of car predictions for a parking | GET    |
-| /api/streams |Returns the list of car predictions for a parking | GET    |
+| /api/streams |Returns the list of cams streams | GET    |
 | /api/parking |Returns the list of parking| GET    |
 | /api/parking |Add new parking| POST   |
 | /api/parking/{id}  |Find parking by id| GET    |
