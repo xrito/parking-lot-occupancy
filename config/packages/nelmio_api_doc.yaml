@@ -1,0 +1,10 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Parking Lot Occupancy Detection
+            description: Detection vehicles in pre-defined parking slots.
+            version: 1.0.0
+    areas:
+        path_patterns:
+            - ^/api(?!/doc\.json$)
+

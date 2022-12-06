@@ -3,20 +3,25 @@
 namespace Parking\Model;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ODM\EmbeddedDocument]
 class Spot implements RectangleInterface, \JsonSerializable
 {
 
     public function __construct(
+        #[Groups(['create', 'detail'])]
         #[ODM\Field(type: 'int')]
-        private int $x,
+        public readonly int $x,
+        #[Groups(['create', 'detail'])]
         #[ODM\Field(type: 'int')]
-        private int $y,
+        public readonly int $y,
+        #[Groups(['create', 'detail'])]
         #[ODM\Field(type: 'int')]
-        private int $width,
+        public readonly int $width,
+        #[Groups(['create', 'detail'])]
         #[ODM\Field(type: 'int')]
-        private int $height) {
+        public readonly int $height) {
     }
 
     public function isFree(RectangleInterface $prediction): bool

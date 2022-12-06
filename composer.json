@@ -9,10 +9,12 @@
         "ext-gd": "*",
         "ext-iconv": "*",
         "ext-imagick": "*",
+        "ext-pcntl": "*",
         "doctrine/annotations": "^1.0",
         "doctrine/mongodb-odm-bundle": "4.5.x-dev",
         "friendsofsymfony/jsrouting-bundle": "^3.2",
         "guzzlehttp/guzzle": "^7.5",
+        "nelmio/api-doc-bundle": "^4.10",
         "php-ffmpeg/php-ffmpeg": "^1.0",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.9",
@@ -36,8 +38,7 @@
         "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
         "symfony/webpack-encore-bundle": "^1.16",
-        "symfony/yaml": "6.0.*",
-        "ext-pcntl": "*"
+        "symfony/yaml": "6.0.*"
     },
     "config": {
         "allow-plugins": {

@@ -49,6 +49,12 @@ services:
     volumes:
       - ./assets:/var/www/html/assets
       - frontend_build:/var/www/html/public/build
-
+  api_doc:
+    image: swaggerapi/swagger-ui:latest
+    restart: always
+    hostname: api_doc
+    container_name: api_doc
+    environment:
+      - SWAGGER_JSON_URL=/api/doc.json
 volumes:
   frontend_build:

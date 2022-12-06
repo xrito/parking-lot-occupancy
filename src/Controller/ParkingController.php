@@ -3,26 +3,27 @@
 namespace Parking\Controller;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Parking\Document\Parking;
+use Parking\Factory\ParkingPreviewFactory;
 use Parking\Model\AlisaRequest;
 use Parking\Model\AlisaResponse;
-use Parking\Service\CameraService;
+use Parking\Model\ParkingPreview;
 use Parking\Service\ParkingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
+use OpenApi\Attributes as OA;
 
 class ParkingController extends AbstractController
 {
     public function __construct(
         private ParkingService $parkingService,
-        private CameraService $cameraService,
+        private ParkingPreviewFactory $parkingPreviewFactory,
         private DocumentManager $documentManager,
         private ValidatorInterface $validator,
         private Environment $twig)
@@ -49,7 +50,25 @@ class ParkingController extends AbstractController
         return new Response($this->twig->render('admin.html.twig'));
     }
 
+    /**
+     * Returns the list of cams streams
+     */
     #[Route('/api/streams', name: 'parking_streams', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(
+                properties: [
+                    new OA\Property(property: 'id', type: 'string'),
+                    new OA\Property(property: 'url', type: 'string')
+                ],
+                type: 'object'
+            )
+        )
+    )]
+    #[OA\Tag(name: 'camera')]
     public function getStreams(): JsonResponse
     {
         return new JsonResponse(
@@ -60,26 +79,67 @@ class ParkingController extends AbstractController
         );
     }
 
+    /**
+     * Returns the list of parking
+     */
     #[Route('/api/parking', name: 'parking_all', options: ['expose' => true], methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(
+                ref: new Model(type: ParkingPreview::class)
+            )
+        )
+    )]
+    #[OA\Tag(name: 'parking')]
     public function getAllParking(Request $request): JsonResponse
     {
         return new JsonResponse($this->parkingService->getParkingPreviews());
     }
 
+    /**
+     * Find parking by id
+     */
     #[Route('/api/parking/{id}', name: 'parking_one', options: ['expose' => true], methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Successful response',
+        content: new OA\JsonContent(
+            ref: new Model(type: ParkingPreview::class, groups: ['detail'])
+        )
+    )]
+    #[OA\Tag(name: 'parking')]
     public function getParking(string $id): JsonResponse
     {
         return new JsonResponse($this->parkingService->getParking($id));
     }
 
+    /**
+     * Deletes a parking by id
+     */
     #[Route('/api/parking/{id}', name: 'parking_remove', options: ['expose' => true], methods: ['DELETE'])]
+    #[OA\Tag(name: 'parking')]
     public function removeParking(string $id): Response
     {
         $this->parkingService->removeParking($id);
         return new JsonResponse('ok');
     }
 
+    /**
+     * Add new parking
+     */
     #[Route('/api/parking', name: 'parking_create', options: ['expose' => true], methods: ['POST'])]
+    #[OA\Post(requestBody: new OA\RequestBody(
+        content: new OA\JsonContent(
+            ref: new Model(
+                type: Parking::class,
+                groups: ['create'],
+            ),
+        )
+    ))]
+    #[OA\Tag(name: 'parking')]
     public function addParking(Request $request): Response
     {
         $contentType = $request->getContentType();
@@ -106,7 +166,7 @@ class ParkingController extends AbstractController
             }
             return new JsonResponse($errorMessages, 400);
         }
-        $id = $this->parkingService->addParking($parking);
-        return new JsonResponse($this->parkingService->createParkingPreview($parking));
+        $this->parkingService->addParking($parking);
+        return new JsonResponse($this->parkingPreviewFactory->createFromParking($parking));
     }
 }

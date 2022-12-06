@@ -15,6 +15,12 @@
 
         push
 
+        redir /api/doc /api/doc/
+
+        handle /api/doc/* {
+            uri strip_prefix /api/doc
+            reverse_proxy api_doc:8080
+        }
 
         handle /stream/* {
             uri strip_prefix /stream

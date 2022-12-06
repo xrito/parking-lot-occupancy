@@ -5,7 +5,9 @@ namespace Parking\Service;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use GuzzleHttp\Promise\PromiseInterface;
 use Parking\Document\Parking;
+use Parking\Factory\ParkingPreviewFactory;
 use Parking\Message\UpdateStreamConfig;
+use Parking\Model\ParkingPreview;
 use Parking\Model\Prediction;
 use Parking\Model\Spot;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -15,6 +17,7 @@ class ParkingService
     public function __construct(
         private VisionService $visionService,
         private CameraService $cameraService,
+        private ParkingPreviewFactory $parkingPreviewFactory,
         private DrawService $drawService,
         private SpotService $spotService,
         private DocumentManager $documentManager,
@@ -27,30 +30,29 @@ class ParkingService
     public function getParkingPreviews(): array
     {
         $parkingList = $this->documentManager->getRepository(Parking::class)->findAll();
-        return array_map($this->createParkingPreview(...), $parkingList);
+        return array_map($this->parkingPreviewFactory->createFromParking(...), $parkingList);
     }
 
-    public function getParking(string $id): ?array
+    public function getParking(string $id): ?ParkingPreview
     {
         $parking = $this->documentManager->getRepository(Parking::class)->find($id);
         if ($parking === null) {
             return null;
         }
-        return array_merge(
-            $this->createParkingPreview($parking),
-            [
-                'spots' => $parking->getSpots()->toArray()]);
+        return $this->parkingPreviewFactory->createFromParking($parking, true);
     }
 
 
-    public function createParkingPreview(Parking $parking): array
+    /**
+     * @param Parking $parking
+     * @return ParkingPreview
+     */
+    public function createParkingPreview(Parking $parking): ParkingPreview
     {
-        return [
-            "id" => $parking->getId(),
-            'name' => $parking->getName(),
-            "preview" => $this->cameraService->getPreviewUrl($parking->getId()),
-            'stream' => $this->cameraService->getStreamUrl($parking->getId()),
-        ];
+        return new ParkingPreview( $parking->getId(),
+          $parking->getName(),
+          $this->cameraService->getPreviewUrl($parking->getId()),
+          $this->cameraService->getStreamUrl($parking->getId()));
     }
 
     public function removeParking(string $id): void

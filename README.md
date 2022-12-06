@@ -51,6 +51,22 @@ Thats it! Wait for the following services to appear as Running or Healthy:
 - backend
 - prediction-worker
 
+## Documentation for API Endpoints
+
+Full Api documentation is available at http://localhost/api/doc/ in Swagger UI in development mode.
+### Short API doc:
+| Endpoint | Description  | Method |
+| --- |---|--------|
+| /api/detection/spots/{id} | Returns the list of numbers available free spots for a parking | GET    |
+| /api/detection/get_detection_predictions | Returns the list of car predictions for a parking | GET    |
+| /api/streams |Returns the list of car predictions for a parking | GET    |
+| /api/parking |Returns the list of parking| GET    |
+| /api/parking |Add new parking| POST   |
+| /api/parking/{id}  |Find parking by id| GET    |
+| /api/parking/{id}  |Deletes a parking by id| DELETE |
+| /api/spots/{id} |Updates spots for a parking| POST   | 
+  
+
 ## Report Issues
 In case you are experiencing a bug or want to request a new feature head over to the [Parking Lot Occupancy Detection monorepo issue tracker](https://github.com/powernic/parking-lot-occupancy/issues)
 
