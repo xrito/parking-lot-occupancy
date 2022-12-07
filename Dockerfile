@@ -219,9 +219,10 @@ ENTRYPOINT ["php", "/app/worker.php"]
 
 FROM jrottenberg/ffmpeg:4-alpine AS test_stream
 COPY --from=aler9/rtsp-simple-server:latest /rtsp-simple-server /app/rtsp-simple-server
-COPY --from=aler9/rtsp-simple-server:latest /rtsp-simple-server.yml /rtsp-simple-server.yml
-
-COPY docker/test_stream/parking-test.mp4 /app/video.mp4
+COPY docker/test_stream/rtsp-simple-server.yml /rtsp-simple-server.yml
+COPY docker/test_stream/video/ /app/video/
+ENV STREAM_NAME="stream"
+ENV STREAM_VIDEO="1.mp4"
 COPY docker/test_stream/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT ["/app/entrypoint.sh"]

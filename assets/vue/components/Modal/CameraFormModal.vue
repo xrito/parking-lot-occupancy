@@ -39,7 +39,7 @@ const formFields = [
     id: props.id + '-stream',
     label: 'Stream\\Video Url',
     name: 'stream',
-    placeholder: 'http://192.168.0.1/stream2',
+    placeholder: 'rtsp://stream.test/stream',
     type: 'url',
   }
 ]

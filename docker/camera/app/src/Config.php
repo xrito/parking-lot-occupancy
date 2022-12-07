@@ -39,7 +39,7 @@ final class Config
                 HTTPBindAddress $this->address
                 MaxHTTPConnections 2000
                 MaxClients 1000
-                MaxBandwidth 15000
+                MaxBandwidth 1000000
                 <Stream status.html>
                 Format status 
                 </Stream>";
@@ -79,11 +79,11 @@ final class Config
                 VideoFrameRate 15 
                 VideoSize %s                
                 VideoQMin 1
-                VideoQMax 1  
-                VideoIntraOnly               
+                VideoQMax 1
+                VideoIntraOnly              
                 VideoBitRate 4000
                 NoAudio
-                Strict -1
+                Strict -1 
                 NoDefaults
                 StartSendOnKey
                 PreRoll %d

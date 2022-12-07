@@ -2,9 +2,18 @@
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from "vue";
 
 const RETRY_TIMEOUT = 1000;
+const SYNCHRONIZE_TIMEOUT = 5000;
+
 const streamLoaded = () => {
-  loading.value = false;
   loaded.value = true;
+  setTimeout(synchronizeStream, SYNCHRONIZE_TIMEOUT)
+}
+const synchronizeStream = () => {
+  if (videoElement.value !== null) {
+    videoElement.value!.onerror = () => {};
+    videoElement.value!.onloadeddata = () => {};
+    loadStream();
+  }
 }
 const retryLoadStream = (e) => {
   setTimeout(loadStream, RETRY_TIMEOUT)
@@ -24,7 +33,6 @@ const stopStreamLoading = () => {
   }
 }
 const videoElement = ref<HTMLVideoElement | null>(null);
-const loading = ref(true);
 const loaded = ref(false);
 
 interface Props {
@@ -40,8 +48,8 @@ onBeforeUnmount(stopStreamLoading);
 
 <template>
   <div class="lazy-video d-flex justify-content-center align-items-center">
-    <video ref="videoElement" v-show="loaded" :width="width" :height="height"  autoplay muted />
-    <div class="spinner-grow" v-if="loading"></div>
+    <video ref="videoElement" :width="width" :height="height"  autoplay muted />
+    <div class="spinner-grow" v-if="!loaded"></div>
   </div>
 </template>
 
@@ -54,6 +62,9 @@ onBeforeUnmount(stopStreamLoading);
   background-color: #868e96;
 }
 
+.spinner-grow{
+  position: absolute;
+}
 .lazy-video video {
   width: 100%;
   height: 100%;

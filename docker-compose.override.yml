@@ -57,10 +57,15 @@ services:
     environment:
       - SWAGGER_JSON_URL=/api/doc.json
   test_stream:
+    init: true
     build:
       context: .
       target: test_stream
-    hostname: 'test_stream'
+    hostname: 'stream.test'
     container_name: test_stream
+    environment:
+      - STREAM_VIDEO=2.mp4
+    volumes:
+      - ./docker/test_stream/video/:/app/video/
 volumes:
   frontend_build:
