@@ -8,7 +8,7 @@ Deep learning models are used to determine the occupancy of parking spaces
 from images obtained by surveillance cameras.
 Such deep neural networks achieve high accuracy and applicability in real-time environments.
 
-[Example](https://user-images.githubusercontent.com/2115607/203495578-95cd8289-9260-4bfd-8514-1fb46f9ea1bd.webm)
+[example.webm](https://user-images.githubusercontent.com/2115607/206187702-7135511d-d73d-445d-96ce-54b7af32869c.webm)
 ## Key Features
 
 Real-time parking lot occupancy detection allows decentralized processing for public and private parking facilities.
