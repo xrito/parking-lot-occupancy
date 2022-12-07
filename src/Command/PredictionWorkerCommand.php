@@ -21,7 +21,7 @@ class PredictionWorkerCommand extends Command
 {
 
     private bool $shouldContinue = true;
-    private float $ttlInSeconds = 0.3;
+    private float $ttlInSeconds = 0.14;
     private string $freeSpotTopic = '/parking/free_spots/';
     private string $predictionTopic = '/parking/predictions/';
 

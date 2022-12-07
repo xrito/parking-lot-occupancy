@@ -7,7 +7,7 @@ import ParkingRepository from "../../../src/Repository/ParkingRepository";
 import {fabric} from "fabric";
 import {useMeta} from "vue-meta";
 import ToolBar from "../Parking/ToolBar.vue";
-import LazyImage from "../Preview/LazyImage.vue";
+import LazyVideo from "../Preview/LazyVideo.vue";
 
 const router = useRouter();
 const parking = ref<Parking>();
@@ -30,6 +30,7 @@ const size = {
 onMounted(async () => {
   parking.value = (await ParkingRepository.get(id)).data;
   parkingService.init(new fabric.Canvas(canvasElement.value!), parking.value.spots, defaultMonitoringType);
+
 });
 
 onUnmounted(() => {
@@ -48,7 +49,7 @@ useMeta(meta);
     <div class="d-flex flex-row">
       <div class="col">
         <div id="camera" :style="{ width: size.width+'px', height: size.height+'px'}">
-          <LazyImage class="camera-image" v-if="parking?.stream" :src="parking?.stream" :width="size.width" :height="size.height"/>
+          <LazyVideo class="camera-stream" v-if="parking?.stream" :width="size.width" :height="size.height" :src="parking?.stream" />
           <canvas ref="canvasElement" :width="size.width" :height="size.height"></canvas>
         </div>
       </div>
@@ -71,7 +72,7 @@ useMeta(meta);
   margin: 0;
 }
 
-#camera .camera-image {
+#camera .camera-stream {
   max-width: 100%;
   display: block;
   position: absolute;

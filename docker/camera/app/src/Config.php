@@ -15,9 +15,9 @@ final class Config
         private string $feedPath = '/tmp',
         private string $size = '640x360',
         private string $snapshotStreamPostfix = 'still.jpg',
-        private string $videoStreamPostfix = 'live.mjpg',
+        private string $videoStreamPostfix = 'live.ogg',
         private string $snapshotFormat = 'jpeg',
-        private string $videoFormat = 'mpjpeg')
+        private string $videoFormat = 'ogg')
     {
     }
 
@@ -39,7 +39,7 @@ final class Config
                 HTTPBindAddress $this->address
                 MaxHTTPConnections 2000
                 MaxClients 1000
-                MaxBandwidth 10000
+                MaxBandwidth 15000
                 <Stream status.html>
                 Format status 
                 </Stream>";
@@ -69,28 +69,31 @@ final class Config
         return $this->getStream($stream, $this->videoFormat, $this->videoStreamPostfix);
     }
 
-    private function getStream(Stream $stream, string $format, string $name): string
+    private function getStream(Stream $stream, string $format, string $name, int $delay = 0): string
     {
 
         return sprintf(
             "<Stream %s-%s>
                 Feed %s
-                Format %s
-                VideoFrameRate 15
+                Format %s 
+                VideoFrameRate 15 
                 VideoSize %s                
                 VideoQMin 1
-                VideoQMax 1
+                VideoQMax 1  
                 VideoIntraOnly               
-                VideoBitRate 1000
+                VideoBitRate 4000
                 NoAudio
                 Strict -1
                 NoDefaults
+                StartSendOnKey
+                PreRoll %d
                 </Stream>",
             $stream->getId(),
             $name,
             $stream->getName(),
             $format,
-            $this->size
+            $this->size,
+            $delay
         );
     }
 }

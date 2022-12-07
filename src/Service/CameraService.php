@@ -35,7 +35,7 @@ class CameraService
 
     public function getStreamUrl(string $streamId): string
     {
-        return $this->entrypoint . '/' . $streamId . '-live.mjpg';
+        return $this->entrypoint . '/' . $streamId . '-live.ogg';
     }
 
     /**

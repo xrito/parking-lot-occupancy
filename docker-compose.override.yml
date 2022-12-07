@@ -56,5 +56,11 @@ services:
     container_name: api_doc
     environment:
       - SWAGGER_JSON_URL=/api/doc.json
+  test_stream:
+    build:
+      context: .
+      target: test_stream
+    hostname: 'test_stream'
+    container_name: test_stream
 volumes:
   frontend_build:
