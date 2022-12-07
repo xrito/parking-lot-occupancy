@@ -22,7 +22,7 @@ const parkingService = new ParkingService(
 
 const switchMonitoring = (type: string) => parkingService.switchMonitoring(type);
 
-const defaultMonitoringType = 'spot';
+const defaultMonitoringType = 'prediction';
 const size = {
   width: 640,
   height: 360

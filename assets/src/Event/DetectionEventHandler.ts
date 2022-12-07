@@ -26,8 +26,8 @@ export default abstract class {
     public deactivate(): void {
         if (this._eventSource) {
             this._eventSource.close();
-            this.onDeactivate();
         }
+        this.onDeactivate();
     }
 
     protected onDeactivate(): void {
